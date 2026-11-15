@@ -64,5 +64,6 @@ FinancialTrack*.apk
 key.properties
 
 # Python & Scratch Artifacts
-__pycache__/
+*.py
 *.py[cod]
+__pycache__/
