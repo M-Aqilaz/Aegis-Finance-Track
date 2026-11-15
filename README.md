@@ -12,10 +12,27 @@
 <p align="center">
   <img src="https://img.shields.io/badge/Flutter-3.x-02569B?logo=flutter" alt="Flutter"/>
   <img src="https://img.shields.io/badge/Dart-3.x-0175C2?logo=dart" alt="Dart"/>
-  <img src="https://img.shields.io/badge/Tests-28%2F28%20Passed-10B981" alt="Tests"/>
+  <img src="https://img.shields.io/badge/Tests-29%2F29%20Passed-10B981" alt="Tests"/>
   <img src="https://img.shields.io/badge/Privacy-100%25%20Offline--First-00F59B" alt="Privacy"/>
   <img src="https://img.shields.io/badge/License-MIT-F59E0B" alt="License"/>
 </p>
+
+---
+
+## 📥 Download Langsung (Installer APK Siap Pakai)
+
+Bagi pengguna umum atau teman-teman yang ingin langsung mencoba Aegis Finance di HP Android, **tidak perlu setup Flutter atau coding dari nol!** Cukup unduh installer APK resmi di bawah:
+
+<p align="center">
+  <a href="https://github.com/M-Aqilaz/Aegis-Finance-Track/releases/latest/download/AegisFinance-Universal.apk">
+    <img src="https://img.shields.io/badge/Download_APK-AegisFinance--Universal.apk-00F59B?style=for-the-badge&logo=android&logoColor=0B0F17" alt="Download APK Siap Pakai"/>
+  </a>
+</p>
+
+### 📱 Panduan Install Cepat di HP Android (3 Langkah Mudah):
+1. **Download**: Klik tombol download di atas atau unduh melalui halaman [GitHub Releases](https://github.com/M-Aqilaz/Aegis-Finance-Track/releases).
+2. **Pasang (Install)**: Buka file `.apk` hasil download di file manager / browser HP Anda. Jika muncul notifikasi *"Izinkan instalasi dari sumber ini"*, pilih **Izinkan (Allow)**.
+3. **Beres**: Buka aplikasi dan nikmati pembukuan keuangan berstandar tinggi yang 100% offline, tanpa iklan, dan tanpa perlu login!
 
 ---
 
@@ -66,9 +83,9 @@
 * **Auto-Lock Lifecycle**: Automatically locks the app whenever minimized or switched to another app.
 * **Biometric Shortcut**: 1-tap fingerprint / Face ID instant unlock.
 
-### 4. 👁️ "Tongkrongan Mode" (Privacy Curtain)
-* One-tap eye toggle in the top bar and on the Titanium Card.
-* Instantly disguises all sensitive figures as `Rp ••••••••` and `Rp •••`, allowing you to record expenses comfortably in public or cafes without shoulder surfers peeking at your balances.
+### 4. 👁️ Privasi Cepat Saldo (Privacy Curtain)
+* One-tap eye toggle di top bar dan kartu Titanium VIP.
+* Seketika menyamarkan seluruh nominal angka saldo menjadi `Rp ••••••••` dan `Rp •••`, sehingga Anda bisa mencatat transaksi dengan tenang di tempat umum/kafe tanpa khawatir orang di sebelah melirik saldo Anda.
 
 ### 5. ⚡ 3-Second Quick-Log BottomSheet
 * Tactile numeric keypad, fast amount chips (`+5k`, `+10k`, `+20k`, `+50k`, `+100k`), and vibrant category avatars to log transactions in under 3 seconds.

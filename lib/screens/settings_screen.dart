@@ -152,82 +152,24 @@ class _SettingsScreenState extends State<SettingsScreen> {
     }
   }
 
-  void _showFormulaExplanation() {
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Row(
-          children: [
-            Icon(Icons.calculate_outlined, color: Color(0xFF6366F1)),
-            SizedBox(width: 8),
-            Text('Rumus Financial Track'),
-          ],
-        ),
-        content: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Text(
-                'Sistem perhitungan otomatis sesuai format pencatatanmu:',
-                style: TextStyle(fontSize: 13, color: Colors.grey),
-              ),
-              const SizedBox(height: 12),
-              _buildFormulaItem(
-                'Pemasukan (Income)',
-                'Semua uang yang masuk ke kantongmu hari itu.',
-                const Color(0xFF10B981),
-              ),
-              _buildFormulaItem(
-                'Pengeluaran (Expense)',
-                'Semua biaya hidup yang keluar. Dicatat rinci per kategori agar tidak bocor.',
-                const Color(0xFFEF4444),
-              ),
-              _buildFormulaItem(
-                'Save (Tabungan Harian)',
-                'Uang yang disisihkan hari ini ke tabungan / brankas.',
-                const Color(0xFF3B82F6),
-              ),
-              _buildFormulaItem(
-                'Sisa (Saldo Kas Berjalan)',
-                'Sisa Hari Ini = Sisa Kemarin + Pemasukan - Pengeluaran - Save.',
-                const Color(0xFF8B5CF6),
-              ),
-              _buildFormulaItem(
-                'Total Simpan (Akumulasi)',
-                'Total Simpan = Total Simpan Kemarin + Save Hari Ini.',
-                const Color(0xFF06B6D4),
-              ),
-              _buildFormulaItem(
-                'Total Kekayaan (Net Worth)',
-                'Net Worth = Sisa Saldo + Total Simpan.',
-                const Color(0xFFF59E0B),
-              ),
-            ],
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('Tutup'),
-          ),
-        ],
-      ),
-    );
-  }
-
   void _showExportDialog() {
     final jsonStr = widget.storageService.exportJson();
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Ekspor Cadangan Data'),
+        title: const Row(
+          children: [
+            Icon(Icons.share_rounded, color: Color(0xFF6366F1), size: 20),
+            SizedBox(width: 8),
+            Text('Kode Cadangan (Pindah HP)', style: TextStyle(fontSize: 16)),
+          ],
+        ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              'Salin teks JSON berikut untuk mencadangkan atau memindahkan catatan ke perangkat lain:',
+              'Salin kode di bawah ini lalu kirimkan ke chat WhatsApp pribadi atau simpan di Catatan HP. Di HP baru, Anda tinggal menempelkannya.',
               style: TextStyle(fontSize: 12, color: Colors.grey),
             ),
             const SizedBox(height: 12),
@@ -250,18 +192,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('Batal'),
+            child: const Text('Tutup'),
           ),
           ElevatedButton.icon(
             onPressed: () {
               Clipboard.setData(ClipboardData(text: jsonStr));
               Navigator.pop(ctx);
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Data JSON berhasil disalin ke clipboard!')),
+                const SnackBar(
+                  content: Text('Kode cadangan disalin! Siap dikirim ke WA/catatan pribadi.'),
+                  backgroundColor: Color(0xFF6366F1),
+                ),
               );
             },
             icon: const Icon(Icons.copy, size: 16),
-            label: const Text('Salin Data'),
+            label: const Text('Salin Kode'),
           ),
         ],
       ),
@@ -273,13 +218,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Impor Data JSON'),
+        title: const Row(
+          children: [
+            Icon(Icons.paste_rounded, color: Color(0xFF10B981), size: 20),
+            SizedBox(width: 8),
+            Text('Tempel Kode Cadangan', style: TextStyle(fontSize: 16)),
+          ],
+        ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              'Tempel teks data cadangan JSON yang valid di bawah ini:',
+              'Tempel kode cadangan yang sudah Anda salin dari HP sebelumnya:',
               style: TextStyle(fontSize: 12, color: Colors.grey),
             ),
             const SizedBox(height: 12),
@@ -287,7 +238,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               controller: controller,
               maxLines: 4,
               decoration: InputDecoration(
-                hintText: '[{"date": "2026-11-03...", ...}]',
+                hintText: 'Tempel kode di sini...',
                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
               ),
             ),
@@ -299,6 +250,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
             child: const Text('Batal'),
           ),
           ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF10B981),
+              foregroundColor: Colors.white,
+            ),
             onPressed: () async {
               final text = controller.text.trim();
               if (text.isNotEmpty) {
@@ -311,53 +266,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     SnackBar(
                       content: Text(
                         success
-                            ? 'Data berhasil diimpor & saldo telah dihitung ulang!'
-                            : 'Gagal mengimpor data. Format JSON tidak sesuai.',
+                            ? 'Data berhasil dipulihkan & saldo telah sinkron!'
+                            : 'Gagal memulihkan data. Format kode tidak valid.',
                       ),
-                      backgroundColor: success ? Colors.green : Colors.red,
+                      backgroundColor: success ? const Color(0xFF10B981) : Colors.red,
                     ),
                   );
                 }
               }
             },
-            child: const Text('Impor'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildFormulaItem(String title, String desc, Color color) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            margin: const EdgeInsets.only(top: 4),
-            width: 8,
-            height: 8,
-            decoration: BoxDecoration(color: color, shape: BoxShape.circle),
-          ),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.bold,
-                    color: color,
-                  ),
-                ),
-                Text(
-                  desc,
-                  style: const TextStyle(fontSize: 12),
-                ),
-              ],
-            ),
+            child: const Text('Terapkan & Pulihkan'),
           ),
         ],
       ),
@@ -416,17 +334,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     },
                   ),
                 ],
-                const Divider(height: 1),
-                SwitchListTile(
-                  secondary: const Icon(Icons.visibility_off_rounded, color: AppTheme.solarAmber),
-                  title: const Text('Tongkrongan Mode (Privasi Saldo)', style: TextStyle(fontWeight: FontWeight.w600)),
-                  value: s.privacyMode,
-                  activeThumbColor: AppTheme.solarAmber,
-                  onChanged: (val) async {
-                    await s.togglePrivacyMode();
-                    setState(() {});
-                  },
-                ),
               ],
             ),
           ),
@@ -466,38 +373,23 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
           const SizedBox(height: 24),
 
-          // FINANCIAL LOGIC & GUIDE
-          _buildHeader('PANDUAN RUMUS', Icons.lightbulb_outline),
-          Card(
-            child: Column(
-              children: [
-                ListTile(
-                  leading: const Icon(Icons.functions_rounded, color: Color(0xFF8B5CF6)),
-                  title: const Text('Rumus Sisa & Total Simpan'),
-                  trailing: const Icon(Icons.arrow_forward_ios, size: 14),
-                  onTap: _showFormulaExplanation,
-                ),
-              ],
-            ),
-          ),
-
-          const SizedBox(height: 24),
-
-          // BACKUP & RESTORE
-          _buildHeader('DATA & REKAPAN', Icons.backup_outlined),
+          // CADANGAN & PINDAH HP (DEVICE MIGRATION)
+          _buildHeader('CADANGAN & PINDAH HP (GANTI DEVICE)', Icons.phonelink_setup_rounded),
           Card(
             child: Column(
               children: [
                 ListTile(
                   leading: const Icon(Icons.analytics_rounded, color: Color(0xFF6366F1)),
-                  title: const Text('Rekap & Cadangan Riwayat', style: TextStyle(fontWeight: FontWeight.bold)),
+                  title: const Text('Pusat Cadangan & Rekap Riwayat', style: TextStyle(fontWeight: FontWeight.bold)),
+                  subtitle: const Text('Ringkasan aset, file cadangan, & panduan pindah HP', style: TextStyle(fontSize: 12)),
                   trailing: const Icon(Icons.arrow_forward_ios, size: 14),
                   onTap: () => HistoryRecapDialog.show(context, widget.storageService),
                 ),
                 const Divider(height: 1),
                 ListTile(
                   leading: const Icon(Icons.download_rounded, color: Color(0xFF10B981)),
-                  title: const Text('Ekspor File Cadangan (.json)'),
+                  title: const Text('Simpan File Cadangan (.json)'),
+                  subtitle: const Text('Unduh file data untuk disimpan di Drive / folder HP', style: TextStyle(fontSize: 12)),
                   onTap: () async {
                     final messenger = ScaffoldMessenger.of(context);
                     final success = await BackupService.exportBackupFile(widget.storageService);
@@ -506,8 +398,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         SnackBar(
                           content: Text(
                             success
-                                ? 'File cadangan berhasil diekspor / disimpan!'
-                                : 'Gagal mengekspor file cadangan.',
+                                ? 'File cadangan berhasil disimpan!'
+                                : 'Gagal menyimpan file cadangan.',
                           ),
                           backgroundColor: success ? const Color(0xFF10B981) : Colors.red,
                         ),
@@ -518,32 +410,36 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 const Divider(height: 1),
                 ListTile(
                   leading: const Icon(Icons.file_open_rounded, color: Color(0xFF3B82F6)),
-                  title: const Text('Pilih & Impor File (.json)'),
+                  title: const Text('Buka File Cadangan'),
+                  subtitle: const Text('Pilih file cadangan dari HP lama untuk dipulihkan', style: TextStyle(fontSize: 12)),
                   onTap: () => HistoryRecapDialog.show(context, widget.storageService),
                 ),
                 const Divider(height: 1),
                 ListTile(
-                  leading: const Icon(Icons.text_snippet_outlined, color: Colors.blueGrey),
-                  title: const Text('Salin Teks Cadangan (JSON)'),
+                  leading: const Icon(Icons.copy_rounded, color: Colors.indigoAccent),
+                  title: const Text('Salin Kode Cadangan (Kirim ke Chat/WA)'),
+                  subtitle: const Text('Praktis kirim ke WhatsApp sendiri tanpa download file', style: TextStyle(fontSize: 12)),
                   onTap: _showExportDialog,
                 ),
                 const Divider(height: 1),
                 ListTile(
-                  leading: const Icon(Icons.paste_rounded, color: Colors.blueGrey),
-                  title: const Text('Tempel Teks Cadangan (JSON)'),
+                  leading: const Icon(Icons.paste_rounded, color: Color(0xFF10B981)),
+                  title: const Text('Tempel Kode Cadangan'),
+                  subtitle: const Text('Pulihkan data dari kode yang disalin dari HP lama', style: TextStyle(fontSize: 12)),
                   onTap: _showImportDialog,
                 ),
                 const Divider(height: 1),
                 ListTile(
                   leading: const Icon(Icons.restart_alt, color: Colors.orange),
-                  title: const Text('Reset ke Data 3-8 Nov 2026', style: TextStyle(color: Colors.orange)),
+                  title: const Text('Reset Data ke Awal', style: TextStyle(color: Colors.orange)),
+                  subtitle: const Text('Kosongkan riwayat transaksi untuk mulai baru', style: TextStyle(fontSize: 12)),
                   onTap: () {
                     showDialog(
                       context: context,
                       builder: (ctx) => AlertDialog(
-                        title: const Text('Reset Data?'),
+                        title: const Text('Reset Data Aplikasi?'),
                         content: const Text(
-                          'Data akan dikembalikan ke catatan resmi 3-8 November 2026 dan saldo SeaBank Rp 30.000.',
+                          'Semua riwayat transaksi dan penyesuaian saldo akan diatur ulang ke kondisi awal default. Pastikan Anda telah membuat cadangan data jika diperlukan.',
                         ),
                         actions: [
                           TextButton(
@@ -561,11 +457,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               if (ctx.mounted) Navigator.pop(ctx);
                               if (mounted) {
                                 messenger.showSnackBar(
-                                  const SnackBar(content: Text('Data berhasil di-reset ke 3-8 November 2026')),
+                                  const SnackBar(content: Text('Data aplikasi berhasil di-reset ke kondisi awal default.')),
                                 );
                               }
                             },
-                            child: const Text('Reset'),
+                            child: const Text('Reset Sekarang'),
                           ),
                         ],
                       ),

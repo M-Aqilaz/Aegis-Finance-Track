@@ -87,27 +87,21 @@ class HomeScreen extends StatelessWidget {
                         const Text(
                           'AEGIS FINANCE',
                           style: TextStyle(
-                            fontSize: 11,
+                            fontSize: 17,
                             fontWeight: FontWeight.w900,
-                            letterSpacing: 1.5,
-                            color: AppTheme.cyberMint,
+                            letterSpacing: 1.2,
+                            color: Colors.white,
                           ),
                         ),
                         const SizedBox(height: 2),
-                        const Row(
-                          children: [
-                            Text(
-                              'Halo, M.Aqilaz',
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w800,
-                                color: Colors.white,
-                                letterSpacing: -0.4,
-                              ),
-                            ),
-                            SizedBox(width: 6),
-                            Icon(Icons.waving_hand_rounded, size: 16, color: Color(0xFFFBBF24)),
-                          ],
+                        const Text(
+                          'Smart Wealth Guardian',
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w600,
+                            color: AppTheme.cyberMint,
+                            letterSpacing: 0.5,
+                          ),
                         ),
                       ],
                     ),

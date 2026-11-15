@@ -147,7 +147,7 @@ class _HistoryRecapSheetState extends State<_HistoryRecapSheet> {
     Clipboard.setData(ClipboardData(text: jsonStr));
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
-        content: Text('Teks data cadangan disalin ke clipboard!'),
+        content: Text('Kode cadangan disalin ke clipboard! Siap dikirim ke WA/catatan pribadi.'),
         backgroundColor: Color(0xFF6366F1),
       ),
     );
@@ -158,15 +158,27 @@ class _HistoryRecapSheetState extends State<_HistoryRecapSheet> {
     showDialog(
       context: context,
       builder: (dialogCtx) => AlertDialog(
-        title: const Text('Tempel Data JSON'),
+        title: const Row(
+          children: [
+            Icon(Icons.paste_rounded, color: Color(0xFF10B981), size: 20),
+            SizedBox(width: 8),
+            Text('Tempel Kode Cadangan', style: TextStyle(fontSize: 16)),
+          ],
+        ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            const Text(
+              'Tempel kode cadangan yang disalin dari HP sebelumnya:',
+              style: TextStyle(fontSize: 12, color: Colors.grey),
+            ),
+            const SizedBox(height: 10),
             TextField(
               controller: controller,
               maxLines: 5,
               decoration: InputDecoration(
-                hintText: 'Tempel teks JSON di sini...',
+                hintText: 'Tempel kode di sini...',
                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
               ),
             ),
@@ -178,6 +190,10 @@ class _HistoryRecapSheetState extends State<_HistoryRecapSheet> {
             child: const Text('Batal'),
           ),
           ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF10B981),
+              foregroundColor: Colors.white,
+            ),
             onPressed: () async {
               final text = controller.text.trim();
               if (text.isNotEmpty) {
@@ -189,8 +205,8 @@ class _HistoryRecapSheetState extends State<_HistoryRecapSheet> {
                     SnackBar(
                       content: Text(
                         success
-                            ? 'Data riwayat & aset berhasil diimpor!'
-                            : 'Gagal mengimpor data.',
+                            ? 'Data riwayat & aset berhasil dipulihkan!'
+                            : 'Gagal memulihkan data. Format kode tidak valid.',
                       ),
                       backgroundColor: success ? const Color(0xFF10B981) : Colors.red,
                     ),
@@ -198,7 +214,7 @@ class _HistoryRecapSheetState extends State<_HistoryRecapSheet> {
                 }
               }
             },
-            child: const Text('Impor'),
+            child: const Text('Terapkan & Pulihkan'),
           ),
         ],
       ),
@@ -264,7 +280,7 @@ class _HistoryRecapSheetState extends State<_HistoryRecapSheet> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 const Text(
-                  'Rekap & Cadangan Riwayat',
+                  'Cadangan & Pindah HP',
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
                 Container(
@@ -293,7 +309,48 @@ class _HistoryRecapSheetState extends State<_HistoryRecapSheet> {
                 fontWeight: FontWeight.w500,
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 14),
+
+            // Pindah HP Info Card
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+              decoration: BoxDecoration(
+                color: const Color(0xFF6366F1).withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(color: const Color(0xFF6366F1).withValues(alpha: 0.25)),
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.phonelink_setup_rounded, color: Color(0xFF818CF8), size: 24),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Mau Ganti HP atau Pindah Device?',
+                          style: TextStyle(
+                            fontSize: 12.5,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF818CF8),
+                          ),
+                        ),
+                        const SizedBox(height: 3),
+                        Text(
+                          '1. Di HP lama: Simpan file cadangan atau salin kode ke WhatsApp.\n2. Di HP baru: Buka file atau tempel kodenya di menu ini. Semua saldo & riwayat langsung pindah!',
+                          style: TextStyle(
+                            fontSize: 11,
+                            color: isDark ? Colors.grey[300] : Colors.grey[700],
+                            height: 1.3,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 14),
 
             // Total Semua Aset Card
             Container(
@@ -430,7 +487,7 @@ class _HistoryRecapSheetState extends State<_HistoryRecapSheet> {
                 onPressed: _handleExportFile,
                 icon: const Icon(Icons.download_rounded),
                 label: const Text(
-                  'Ekspor & Simpan File Cadangan',
+                  'Simpan File Cadangan (.json)',
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
               ),
@@ -447,13 +504,13 @@ class _HistoryRecapSheetState extends State<_HistoryRecapSheet> {
                 onPressed: _handlePickAndImportFile,
                 icon: const Icon(Icons.file_open_rounded),
                 label: const Text(
-                  'Pilih & Impor File Cadangan',
+                  'Buka & Pulihkan File Cadangan',
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
               ),
               const SizedBox(height: 10),
 
-              // 3. Copy / Paste JSON Text Buttons Row
+              // 3. Copy / Paste Code Buttons Row
               Row(
                 children: [
                   Expanded(
@@ -463,7 +520,10 @@ class _HistoryRecapSheetState extends State<_HistoryRecapSheet> {
                       ),
                       onPressed: _handleCopyJsonText,
                       icon: const Icon(Icons.copy_rounded, size: 16),
-                      label: const Text('Salin Teks JSON'),
+                      label: const Text(
+                        'Salin Kode (WA)',
+                        style: TextStyle(fontSize: 12),
+                      ),
                     ),
                   ),
                   Expanded(
@@ -473,7 +533,10 @@ class _HistoryRecapSheetState extends State<_HistoryRecapSheet> {
                       ),
                       onPressed: _handlePasteJsonDialog,
                       icon: const Icon(Icons.paste_rounded, size: 16),
-                      label: const Text('Tempel Teks JSON'),
+                      label: const Text(
+                        'Tempel Kode',
+                        style: TextStyle(fontSize: 12),
+                      ),
                     ),
                   ),
                 ],
