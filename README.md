@@ -2,7 +2,7 @@
   <img src="docs/screenshots/aegis_mascot_logo.jpg" alt="Aegis Finance Mascot" width="120" style="border-radius: 28px; box-shadow: 0 10px 30px rgba(0,245,155,0.3);"/>
 </p>
 
-<h1 align="center">🛡️ Aegis Finance • Phoenix Edition</h1>
+<h1 align="center">🛡️ Aegis Finance</h1>
 
 <p align="center">
   <strong>The Sophisticated, Offline-First Personal Wealth Guardian</strong><br>
@@ -58,7 +58,7 @@
   * **Ring 1 (Electric Purple 🟣)**: *Catat Streak* — Daily logging consistency.
   * **Ring 2 (Cyber-Mint 🟢)**: *Kendali Kas* — Real-time radar of daily expense vs. budget limit.
   * **Ring 3 (Solar Amber 🟡)**: *Nabung Vault* — Monthly savings goal progression.
-* Cyber-Phoenix guardian avatar sits at the center of the ring.
+* Mascot guardian avatar sits at the center of the ring.
 
 ### 3. 🔒 Aegis Security Vault (PIN & Biometric Lock)
 * **4-Digit Tactile Numpad**: Custom obsidian numpad with alphanumeric sub-labels (ABC, DEF...).
@@ -146,5 +146,5 @@ Distributed under the MIT License. See `LICENSE` for more information.
 ---
 
 <p align="center">
-  Crafted with care by <strong>M.Aqilaz</strong> • <em>Protected by the Cyber-Phoenix Guardian</em> 🦅
+  Crafted with care by <strong>M.Aqilaz</strong>
 </p>

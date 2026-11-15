@@ -349,33 +349,18 @@ class TitaniumCard extends StatelessWidget {
 
                 const SizedBox(height: 14),
 
-                // Card Footer: Cardholder + Action Pill
+                // Card Footer: Clean Action Pill
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'CARDHOLDER',
-                          style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.35),
-                            fontSize: 9,
-                            fontWeight: FontWeight.bold,
-                            letterSpacing: 1.0,
-                          ),
-                        ),
-                        const SizedBox(height: 1),
-                        const Text(
-                          'M.AQILAZ • PHOENIX GUARDIAN',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 12,
-                            fontWeight: FontWeight.w700,
-                            letterSpacing: 0.5,
-                          ),
-                        ),
-                      ],
+                    Text(
+                      'AEGIS TITANIUM VAULT',
+                      style: TextStyle(
+                        color: Colors.white.withValues(alpha: 0.35),
+                        fontSize: 9.5,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: 1.2,
+                      ),
                     ),
 
                     // Luxury Action Glass Pill: Pindah / Ambil Dana

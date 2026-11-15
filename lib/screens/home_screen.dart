@@ -84,46 +84,14 @@ class HomeScreen extends StatelessWidget {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Row(
-                          children: [
-                            const Text(
-                              'AEGIS FINANCE',
-                              style: TextStyle(
-                                fontSize: 11,
-                                fontWeight: FontWeight.w900,
-                                letterSpacing: 1.5,
-                                color: AppTheme.cyberMint,
-                              ),
-                            ),
-                            const SizedBox(width: 6),
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
-                              decoration: BoxDecoration(
-                                color: AppTheme.solarAmber.withValues(alpha: 0.15),
-                                borderRadius: BorderRadius.circular(6),
-                                border: Border.all(
-                                  color: AppTheme.solarAmber.withValues(alpha: 0.4),
-                                  width: 0.6,
-                                ),
-                              ),
-                              child: const Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Icon(Icons.shield_rounded, size: 9, color: AppTheme.solarAmber),
-                                  SizedBox(width: 3),
-                                  Text(
-                                    'PHOENIX',
-                                    style: TextStyle(
-                                      fontSize: 8,
-                                      fontWeight: FontWeight.w900,
-                                      color: AppTheme.solarAmber,
-                                      letterSpacing: 0.8,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
+                        const Text(
+                          'AEGIS FINANCE',
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: 1.5,
+                            color: AppTheme.cyberMint,
+                          ),
                         ),
                         const SizedBox(height: 2),
                         const Row(
@@ -203,27 +171,23 @@ class HomeScreen extends StatelessWidget {
                     onPressed: storageService.togglePrivacyMode,
                   ),
 
-                  // Fast Transfer Button
+                  // Quick Log Action (Catat Transaksi 3 Detik)
                   IconButton(
                     icon: Container(
                       padding: const EdgeInsets.all(7),
                       decoration: BoxDecoration(
-                        color: AppTheme.surfaceCardElevated,
+                        color: AppTheme.cyberMint.withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: AppTheme.borderLight),
+                        border: Border.all(color: AppTheme.cyberMint.withValues(alpha: 0.4)),
                       ),
                       child: const Icon(
-                        Icons.swap_horiz_rounded,
+                        Icons.bolt_rounded,
                         size: 20,
                         color: AppTheme.cyberMint,
                       ),
                     ),
-                    tooltip: 'Pindah Dana / Ambil Tabungan',
-                    onPressed: () => TransferDialog.show(
-                      context,
-                      storageService: storageService,
-                      initialFromPocketId: StorageService.kPocketSavingsId,
-                    ),
+                    tooltip: 'Catat Transaksi 3 Detik',
+                    onPressed: () => QuickLogBottomSheet.show(context, storageService: storageService),
                   ),
                   const SizedBox(width: 8),
                 ],
@@ -509,9 +473,55 @@ class HomeScreen extends StatelessWidget {
                         ),
                       ),
 
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 14),
 
-                      // 5. Executive Quick Navigation Cards (Analisis & Riwayat)
+                      // 5. Prominent Integrated Quick Log Action Button
+                      InkWell(
+                        onTap: () => QuickLogBottomSheet.show(context, storageService: storageService),
+                        borderRadius: BorderRadius.circular(16),
+                        child: Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+                          decoration: BoxDecoration(
+                            gradient: const LinearGradient(
+                              colors: [
+                                AppTheme.cyberMint,
+                                Color(0xFF059669),
+                              ],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            ),
+                            borderRadius: BorderRadius.circular(16),
+                            boxShadow: [
+                              BoxShadow(
+                                color: AppTheme.cyberMint.withValues(alpha: 0.35),
+                                blurRadius: 16,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
+                          ),
+                          child: const Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.bolt_rounded, size: 22, color: Colors.black87),
+                              SizedBox(width: 8),
+                              Text(
+                                'Catat Transaksi (3 Detik)',
+                                style: TextStyle(
+                                  fontSize: 14.5,
+                                  fontWeight: FontWeight.w900,
+                                  color: Colors.black87,
+                                  letterSpacing: 0.2,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+
+                      const SizedBox(height: 14),
+
+                      // 6. Executive Quick Navigation Cards (Analisis & Riwayat)
                       Row(
                         children: [
                           Expanded(
@@ -571,35 +581,12 @@ class HomeScreen extends StatelessWidget {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 80),
+                      const SizedBox(height: 90),
                     ],
                   ),
                 ),
               ),
             ],
-          ),
-          floatingActionButton: Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(30),
-              boxShadow: [
-                BoxShadow(
-                  color: AppTheme.cyberMint.withValues(alpha: 0.4),
-                  blurRadius: 20,
-                  offset: const Offset(0, 4),
-                ),
-              ],
-            ),
-            child: FloatingActionButton.extended(
-              backgroundColor: AppTheme.cyberMint,
-              foregroundColor: Colors.black87,
-              elevation: 0,
-              onPressed: () => QuickLogBottomSheet.show(context, storageService: storageService),
-              icon: const Icon(Icons.bolt_rounded, size: 22, color: Colors.black87),
-              label: const Text(
-                'Catat 3 Detik',
-                style: TextStyle(fontWeight: FontWeight.w900, fontSize: 14, color: Colors.black87),
-              ),
-            ),
           ),
         );
       },
