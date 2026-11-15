@@ -59,8 +59,8 @@ class StorageService extends ChangeNotifier {
   int _reminderMinute = 0;
   double _dailyExpenseLimit = 50000;
   String _themeMode = 'dark'; // Dark theme default for modern sleek UI
-  double _seaBankBalance = 143000.0;
-  double _bankJagoBalance = 1755000.0;
+  double _seaBankBalance = 0.0;
+  double _bankJagoBalance = 0.0;
 
   List<DayEntry> get entries => List.unmodifiable(_entries);
   List<AssetAccount> get customAssets => List.unmodifiable(_customAssets);
@@ -225,7 +225,7 @@ class StorageService extends ChangeNotifier {
     return list;
   }
 
-  Future<void> init() async {
+  Future<void> init({bool loadSampleDataIfEmpty = false}) async {
     final prefs = await SharedPreferences.getInstance();
 
     _reminderEnabled = prefs.getBool(_kReminderEnabledKey) ?? true;
@@ -234,8 +234,8 @@ class StorageService extends ChangeNotifier {
     _dailyExpenseLimit = prefs.getDouble(_kExpenseLimitKey) ?? 50000;
     _themeMode = prefs.getString(_kThemeModeKey) ?? 'dark';
     _privacyMode = prefs.getBool(_kPrivacyModeKey) ?? false;
-    _seaBankBalance = prefs.getDouble(_kSeaBankBalanceKey) ?? 143000.0;
-    _bankJagoBalance = prefs.getDouble(_kBankJagoBalanceKey) ?? 1755000.0;
+    _seaBankBalance = prefs.getDouble(_kSeaBankBalanceKey) ?? 0.0;
+    _bankJagoBalance = prefs.getDouble(_kBankJagoBalanceKey) ?? 0.0;
     _pinEnabled = prefs.getBool(_kPinEnabledKey) ?? false;
     _pinCode = prefs.getString(_kPinCodeKey) ?? '';
     _biometricsEnabled = prefs.getBool(_kBiometricsEnabledKey) ?? true;
@@ -271,28 +271,27 @@ class StorageService extends ChangeNotifier {
       }
     }
 
-    // Initialize default assets ONLY if no custom assets exist at all (preserves user data on update)
+    // Initialize default starter pockets with 0 balance if empty (Clean Slate for new users)
     if (_customAssets.isEmpty) {
       _customAssets.add(AssetAccount(
         id: 'asset-seabank',
         name: 'SeaBank',
-        balance: 143000,
+        balance: 0.0,
         colorValue: 0xFFF97316,
         iconName: 'account_balance',
       ));
       _customAssets.add(AssetAccount(
         id: 'asset-bank-jago',
         name: 'Bank Jago',
-        balance: 1755000,
+        balance: 0.0,
         colorValue: 0xFF8B5CF6,
         iconName: 'account_balance_wallet',
       ));
       await _saveCustomAssetsToPrefs();
     }
 
+    // Load user entries (loads user existing data; keeps clean empty [] for new users)
     final jsonString = prefs.getString(_kEntriesKey);
-    bool shouldReloadSeed = false;
-
     if (jsonString != null && jsonString.isNotEmpty) {
       try {
         final List<dynamic> decoded = jsonDecode(jsonString);
@@ -300,26 +299,22 @@ class StorageService extends ChangeNotifier {
         for (var item in decoded) {
           _entries.add(DayEntry.fromJson(item as Map<String, dynamic>));
         }
-
-        // Only reload seed if entries list is completely empty or contains old 112k bug
-        if (_entries.isEmpty || _entries.any((e) => e.income == 112000.0)) {
-          shouldReloadSeed = true;
-        }
       } catch (e) {
         debugPrint('Failed to decode stored entries: $e');
-        shouldReloadSeed = true;
       }
-    } else {
-      shouldReloadSeed = true;
     }
 
-    // Clean up legacy v1 key from browser localStorage if present
-    await prefs.remove('financial_track_entries_v1');
-
-    if (shouldReloadSeed) {
-      _loadSeedData();
-      await _saveEntriesToPrefs();
+    final storedSeedVersion = prefs.getInt(_kSeedVersionKey) ?? 0;
+    final hasLegacySeedAnomaly = _entries.any((e) => e.income == 112000.0);
+    if (storedSeedVersion < _kCurrentSeedVersion && hasLegacySeedAnomaly) {
+      await loadSampleDemoData();
       await prefs.setInt(_kSeedVersionKey, _kCurrentSeedVersion);
+      return;
+    }
+
+    if (_entries.isEmpty && loadSampleDataIfEmpty) {
+      await loadSampleDemoData();
+      return;
     }
 
     _recalculateBalances();
@@ -327,8 +322,8 @@ class StorageService extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Reset to the official 3-10 Nov 2026 seed dataset
-  Future<void> resetToOfficialSeedData() async {
+  /// Load sample demo dataset (for testing or manual demo)
+  Future<void> loadSampleDemoData() async {
     _loadSeedData();
     await _saveEntriesToPrefs();
 
@@ -347,11 +342,13 @@ class StorageService extends ChangeNotifier {
     _transfers.clear();
     await _saveTransfersToPrefs();
 
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setInt(_kSeedVersionKey, _kCurrentSeedVersion);
-
     _recalculateBalances();
     notifyListeners();
+  }
+
+  /// Reset to the official sample dataset
+  Future<void> resetToOfficialSeedData() async {
+    await loadSampleDemoData();
   }
 
   void _loadSeedData() {

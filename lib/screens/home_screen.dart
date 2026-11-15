@@ -1,15 +1,12 @@
 import 'package:flutter/material.dart';
-import '../models/transaction_entry.dart';
 import '../services/storage_service.dart';
 import '../utils/app_theme.dart';
 import '../utils/currency_formatter.dart';
 import '../widgets/asset_dialogs.dart';
-import '../widgets/daily_entry_card.dart';
 import '../widgets/financial_rings_card.dart';
 import '../widgets/quick_log_bottom_sheet.dart';
 import '../widgets/titanium_card.dart';
 import '../widgets/transfer_dialog.dart';
-import 'add_edit_entry_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   final StorageService storageService;
@@ -26,7 +23,6 @@ class HomeScreen extends StatelessWidget {
     return ListenableBuilder(
       listenable: storageService,
       builder: (context, _) {
-        final entries = storageService.entries;
         final cashBalance = storageService.cashBalance;
         final savingsBalance = storageService.savingsBalance;
         final totalAllAssets = storageService.totalAllAssets;
@@ -35,9 +31,6 @@ class HomeScreen extends StatelessWidget {
 
         // Calculate other assets sum (SeaBank, Bank Jago, etc.)
         final otherAssetsSum = storageService.customAssets.fold(0.0, (sum, a) => sum + a.balance);
-
-        final displayEntries = List<DayEntry>.from(entries)
-          ..sort((a, b) => b.date.compareTo(a.date));
 
         // Today's Spending Health Meter
         final now = DateTime.now();
@@ -136,7 +129,7 @@ class HomeScreen extends StatelessWidget {
                         const Row(
                           children: [
                             Text(
-                              'Halo, Azure',
+                              'Halo, M.Aqilaz',
                               style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.w800,
@@ -256,7 +249,35 @@ class HomeScreen extends StatelessWidget {
                         ),
                       ),
 
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 22),
+
+                      // Section Label: Rekening & Dompet
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            'DOMPET & REKENING',
+                            style: TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: 1.2,
+                              color: Colors.white54,
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: () => onNavigateTab(1),
+                            child: const Text(
+                              'Lihat Semua ›',
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                                color: AppTheme.cyberMint,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
 
                       // 2. Multi-Bank Vault Carousel (Authentic Mini Debit Cards)
                       SizedBox(
@@ -392,7 +413,22 @@ class HomeScreen extends StatelessWidget {
                         ),
                       ),
 
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 24),
+
+                      // Section Label: Target & Aktivitas
+                      const Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          'TARGET & AKTIVITAS HARI INI',
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: 1.2,
+                            color: Colors.white54,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
 
                       // 3. The 3 Financial Activity Rings (Daily Goals & Habits)
                       FinancialRingsCard(
@@ -404,7 +440,7 @@ class HomeScreen extends StatelessWidget {
                         onTap: () => QuickLogBottomSheet.show(context, storageService: storageService),
                       ),
 
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 14),
 
                       // 4. Daily Spending Health Radar / Gauge
                       Container(
@@ -473,158 +509,72 @@ class HomeScreen extends StatelessWidget {
                         ),
                       ),
 
-                      const SizedBox(height: 12),
+                      const SizedBox(height: 16),
 
-                      // Kantong Aset & Analisis Navigation Pill
-                      InkWell(
-                        onTap: () => onNavigateTab(1),
-                        borderRadius: BorderRadius.circular(16),
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
-                          decoration: BoxDecoration(
-                            color: AppTheme.electricIndigo.withValues(alpha: 0.12),
-                            borderRadius: BorderRadius.circular(16),
-                            border: Border.all(
-                              color: AppTheme.electricIndigo.withValues(alpha: 0.35),
-                              width: 1,
+                      // 5. Executive Quick Navigation Cards (Analisis & Riwayat)
+                      Row(
+                        children: [
+                          Expanded(
+                            child: InkWell(
+                              onTap: () => onNavigateTab(1),
+                              borderRadius: BorderRadius.circular(16),
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+                                decoration: AppTheme.glassCardDecoration(borderRadius: 16),
+                                child: const Row(
+                                  children: [
+                                    Icon(Icons.pie_chart_rounded, color: Color(0xFF818CF8), size: 18),
+                                    SizedBox(width: 8),
+                                    Expanded(
+                                      child: Text(
+                                        'Analisis Aset',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.w700,
+                                          fontSize: 12.5,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    ),
+                                    Icon(Icons.chevron_right, size: 16, color: Colors.white38),
+                                  ],
+                                ),
+                              ),
                             ),
                           ),
-                          child: const Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Row(
-                                children: [
-                                  Icon(Icons.pie_chart_rounded, color: Color(0xFF818CF8), size: 18),
-                                  SizedBox(width: 10),
-                                  Text(
-                                    'Kantong Aset & Analisis Mendalam',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.w800,
-                                      fontSize: 13,
-                                      color: Color(0xFF818CF8),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: InkWell(
+                              onTap: () => onNavigateTab(2),
+                              borderRadius: BorderRadius.circular(16),
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+                                decoration: AppTheme.glassCardDecoration(borderRadius: 16),
+                                child: const Row(
+                                  children: [
+                                    Icon(Icons.receipt_long_rounded, color: AppTheme.cyberMint, size: 18),
+                                    SizedBox(width: 8),
+                                    Expanded(
+                                      child: Text(
+                                        'Riwayat Kas',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.w700,
+                                          fontSize: 12.5,
+                                          color: Colors.white,
+                                        ),
+                                      ),
                                     ),
-                                  ),
-                                ],
-                              ),
-                              Icon(Icons.arrow_forward_ios_rounded, size: 13, color: Color(0xFF818CF8)),
-                            ],
-                          ),
-                        ),
-                      ),
-
-                      const SizedBox(height: 18),
-
-                      // Section Header: Jurnal Keuangan
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Row(
-                            children: [
-                              const Text(
-                                'Jurnal Keuangan',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w900,
-                                  color: Colors.white,
-                                  letterSpacing: -0.3,
+                                    Icon(Icons.chevron_right, size: 16, color: Colors.white38),
+                                  ],
                                 ),
-                              ),
-                              const SizedBox(width: 8),
-                              Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
-                                decoration: BoxDecoration(
-                                  color: Colors.white.withValues(alpha: 0.1),
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                child: Text(
-                                  '${displayEntries.length} Hari',
-                                  style: const TextStyle(
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white70,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                          TextButton(
-                            onPressed: () => onNavigateTab(2),
-                            child: const Text(
-                              'Arsip Lengkap ›',
-                              style: TextStyle(
-                                color: AppTheme.cyberMint,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 13,
                               ),
                             ),
                           ),
                         ],
                       ),
+                      const SizedBox(height: 80),
                     ],
                   ),
                 ),
-              ),
-
-              // Empty or Entries List
-              displayEntries.isEmpty
-                  ? SliverToBoxAdapter(
-                      child: Padding(
-                        padding: const EdgeInsets.all(24),
-                        child: Container(
-                          padding: const EdgeInsets.all(32),
-                          decoration: AppTheme.glassCardDecoration(borderRadius: 24),
-                          child: Column(
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.all(18),
-                                decoration: BoxDecoration(
-                                  color: AppTheme.cyberMint.withValues(alpha: 0.15),
-                                  shape: BoxShape.circle,
-                                ),
-                                child: const Text('✨🪙', style: TextStyle(fontSize: 32)),
-                              ),
-                              const SizedBox(height: 14),
-                              const Text(
-                                'Belum Ada Jurnal Keuangan',
-                                style: TextStyle(fontWeight: FontWeight.w800, fontSize: 16, color: Colors.white),
-                              ),
-                              const SizedBox(height: 6),
-                              const Text(
-                                'Mulai catat transaksi untuk mengalirkan energi finansial & streak!',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(fontSize: 12, color: Colors.white60),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    )
-                  : SliverList(
-                      delegate: SliverChildBuilderDelegate(
-                        (context, index) {
-                          final entry = displayEntries[index];
-                          return DailyEntryCard(
-                            entry: entry,
-                            onEdit: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => AddEditEntryScreen(
-                                    storageService: storageService,
-                                    existingEntry: entry,
-                                  ),
-                                ),
-                              );
-                            },
-                            onDelete: () => storageService.deleteEntry(entry.id),
-                          );
-                        },
-                        childCount: displayEntries.length,
-                      ),
-                    ),
-
-              const SliverToBoxAdapter(
-                child: SizedBox(height: 100),
               ),
             ],
           ),

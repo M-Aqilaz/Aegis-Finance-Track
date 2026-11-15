@@ -30,10 +30,16 @@ class _HistoryScreenState extends State<HistoryScreen> {
         final isDark = Theme.of(context).brightness == Brightness.dark;
 
         // Filter by month
-        var filtered = allEntries.where((e) {
+        final monthEntries = allEntries.where((e) {
           return e.date.year == _selectedMonth.year &&
               e.date.month == _selectedMonth.month;
         }).toList();
+
+        final expenseCount = monthEntries.where((e) => e.totalExpense > 0).length;
+        final incomeCount = monthEntries.where((e) => e.income > 0).length;
+        final saveCount = monthEntries.where((e) => e.saveAmount > 0).length;
+
+        var filtered = List<DayEntry>.from(monthEntries);
 
         // Filter by search query
         if (_searchQuery.isNotEmpty) {
@@ -229,13 +235,13 @@ class _HistoryScreenState extends State<HistoryScreen> {
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 child: Row(
                   children: [
-                    _buildFilterChip('all', 'Semua (${filtered.length})'),
+                    _buildFilterChip('all', 'Semua (${monthEntries.length})'),
                     const SizedBox(width: 8),
-                    _buildFilterChip('expense', 'Pengeluaran'),
+                    _buildFilterChip('expense', 'Pengeluaran ($expenseCount)'),
                     const SizedBox(width: 8),
-                    _buildFilterChip('income', 'Pemasukan'),
+                    _buildFilterChip('income', 'Pemasukan ($incomeCount)'),
                     const SizedBox(width: 8),
-                    _buildFilterChip('save', 'Save'),
+                    _buildFilterChip('save', 'Save ($saveCount)'),
                   ],
                 ),
               ),
@@ -263,6 +269,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                           final entry = filtered[index];
                           return DailyEntryCard(
                             entry: entry,
+                            activeFilter: _filterType,
                             onEdit: () {
                               Navigator.push(
                                 context,

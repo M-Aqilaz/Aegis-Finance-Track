@@ -10,7 +10,7 @@ void main() {
     test('Calculates Sisa and Total Simpan exactly matches user data (3-10 Nov 2026)', () async {
       SharedPreferences.setMockInitialValues({});
       final storage = StorageService();
-      await storage.init();
+      await storage.init(loadSampleDataIfEmpty: true);
 
       // Check initial 8 days seeded
       final entries = storage.entries;
@@ -89,7 +89,7 @@ void main() {
     test('Adding 11 Nov rolls forward running balances correctly', () async {
       SharedPreferences.setMockInitialValues({});
       final storage = StorageService();
-      await storage.init();
+      await storage.init(loadSampleDataIfEmpty: true);
 
       // Add 11 Nov 2026: Pemasukan 50k, Pengeluaran 10k, Save 20k
       // Previous Sisa: 77k, Previous Total Simpan: 180k

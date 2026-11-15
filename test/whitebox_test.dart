@@ -16,7 +16,7 @@ void main() {
     test('Invariant 1: Sisa Recurrence Relation (Sisa[i] = Sisa[i-1] + In[i] - Out[i] - Save[i])', () async {
       SharedPreferences.setMockInitialValues({});
       final storage = StorageService();
-      await storage.init();
+      await storage.init(loadSampleDataIfEmpty: true);
 
       final entries = storage.entries;
       expect(entries.length, 8);
@@ -67,7 +67,7 @@ void main() {
     test('Branch Coverage: Head, Middle, and Tail Deletion', () async {
       SharedPreferences.setMockInitialValues({});
       final storage = StorageService();
-      await storage.init();
+      await storage.init(loadSampleDataIfEmpty: true);
 
       // Record baseline sisa at end before deletions
       expect(storage.entries.length, 8);
@@ -199,7 +199,7 @@ void main() {
     test('Conservation of Total Assets: Transfer from Tabungan to SeaBank', () async {
       SharedPreferences.setMockInitialValues({});
       final storage = StorageService();
-      await storage.init();
+      await storage.init(loadSampleDataIfEmpty: true);
 
       final initialCash = storage.cashBalance; // 77,000
       final initialSavings = storage.savingsBalance; // 180,000
@@ -239,7 +239,7 @@ void main() {
     test('Conservation of Total Assets: Transfer from Tabungan to Cash', () async {
       SharedPreferences.setMockInitialValues({});
       final storage = StorageService();
-      await storage.init();
+      await storage.init(loadSampleDataIfEmpty: true);
 
       final initialCash = storage.cashBalance; // 77,000
       final initialSavings = storage.savingsBalance; // 180,000
@@ -267,7 +267,7 @@ void main() {
     test('Revert / Delete Transfer restores exact initial balances', () async {
       SharedPreferences.setMockInitialValues({});
       final storage = StorageService();
-      await storage.init();
+      await storage.init(loadSampleDataIfEmpty: true);
 
       final initialSavings = storage.savingsBalance;
       final initialSeaBank = storage.seaBankBalance;
@@ -299,7 +299,7 @@ void main() {
     test('Available pockets listing returns all valid sources and destinations', () async {
       SharedPreferences.setMockInitialValues({});
       final storage = StorageService();
-      await storage.init();
+      await storage.init(loadSampleDataIfEmpty: true);
 
       final pockets = storage.getAvailablePockets();
       expect(pockets.length, 4); // Cash, Tabungan, SeaBank, Bank Jago
@@ -314,7 +314,7 @@ void main() {
     test('State transitions: Add -> Update Balance -> Update Meta -> Delete', () async {
       SharedPreferences.setMockInitialValues({});
       final storage = StorageService();
-      await storage.init();
+      await storage.init(loadSampleDataIfEmpty: true);
 
       final initialCash = storage.cashBalance; // 77,000
       final initialTotal = storage.totalAllAssets; // 2,155,000
@@ -397,7 +397,7 @@ void main() {
     test('Calculates comprehensive history recap across 3-10 Nov 2026', () async {
       SharedPreferences.setMockInitialValues({});
       final storage = StorageService();
-      await storage.init();
+      await storage.init(loadSampleDataIfEmpty: true);
 
       final recap = BackupService.getRecap(storage);
 
@@ -417,7 +417,7 @@ void main() {
     test('Validates and parses backup JSON preview accurately', () async {
       SharedPreferences.setMockInitialValues({});
       final storage = StorageService();
-      await storage.init();
+      await storage.init(loadSampleDataIfEmpty: true);
 
       final jsonStr = storage.exportJson();
       final preview = BackupService.previewBackup(jsonStr);
@@ -441,7 +441,7 @@ void main() {
     test('Calculates 8-day continuous streak accurately across 3-10 Nov 2026', () async {
       SharedPreferences.setMockInitialValues({});
       final storage = StorageService();
-      await storage.init();
+      await storage.init(loadSampleDataIfEmpty: true);
 
       // Test with reference date = 10 Nov 2026 (day of 8th entry)
       final streakOnNov10 = StreakInfo.calculate(storage.entries, now: DateTime(2026, 11, 10));
@@ -529,6 +529,19 @@ void main() {
 
       storage.unlockApp();
       expect(storage.isAppLocked, isFalse);
+    });
+
+    test('Zero-Leak Privacy: Fresh init without sample flag starts with 0 entries and 0 default balances', () async {
+      SharedPreferences.setMockInitialValues({});
+      final storage = StorageService();
+      await storage.init();
+
+      expect(storage.entries.isEmpty, isTrue);
+      expect(storage.currentSisa, 0.0);
+      expect(storage.currentTotalSimpan, 0.0);
+      expect(storage.seaBankBalance, 0.0);
+      expect(storage.bankJagoBalance, 0.0);
+      expect(storage.totalAllAssets, 0.0);
     });
   });
 }

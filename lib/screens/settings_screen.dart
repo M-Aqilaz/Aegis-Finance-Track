@@ -392,12 +392,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 SwitchListTile(
                   secondary: const Icon(Icons.pin_rounded, color: AppTheme.cyberMint),
                   title: const Text('Kunci Aplikasi dengan PIN', style: TextStyle(fontWeight: FontWeight.w600)),
-                  subtitle: Text(
-                    s.pinEnabled
-                        ? 'Aegis Vault aktif (Aplikasi terkunci saat dibuka)'
-                        : 'Nonaktif (Aplikasi langsung terbuka)',
-                    style: const TextStyle(fontSize: 12),
-                  ),
                   value: s.pinEnabled,
                   activeThumbColor: AppTheme.cyberMint,
                   onChanged: _togglePinLock,
@@ -407,7 +401,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ListTile(
                     leading: const Icon(Icons.lock_reset_rounded, color: AppTheme.solarAmber),
                     title: const Text('Ubah PIN Pengaman'),
-                    subtitle: const Text('Ganti 4-digit PIN rahasia Anda', style: TextStyle(fontSize: 12)),
                     trailing: const Icon(Icons.arrow_forward_ios, size: 14),
                     onTap: _openPinChange,
                   ),
@@ -415,7 +408,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   SwitchListTile(
                     secondary: const Icon(Icons.fingerprint_rounded, color: AppTheme.electricCyan),
                     title: const Text('Buka Cepat dengan Biometrik', style: TextStyle(fontWeight: FontWeight.w600)),
-                    subtitle: const Text('Gunakan Sidik Jari / Face ID di lockscreen', style: TextStyle(fontSize: 12)),
                     value: s.biometricsEnabled,
                     activeThumbColor: AppTheme.electricCyan,
                     onChanged: (val) async {
@@ -428,7 +420,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 SwitchListTile(
                   secondary: const Icon(Icons.visibility_off_rounded, color: AppTheme.solarAmber),
                   title: const Text('Tongkrongan Mode (Privasi Saldo)', style: TextStyle(fontWeight: FontWeight.w600)),
-                  subtitle: const Text('Samarkan nominal saldo menjadi Rp ••• di beranda', style: TextStyle(fontSize: 12)),
                   value: s.privacyMode,
                   activeThumbColor: AppTheme.solarAmber,
                   onChanged: (val) async {

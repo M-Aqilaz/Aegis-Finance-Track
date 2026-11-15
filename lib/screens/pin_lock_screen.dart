@@ -189,7 +189,7 @@ class _PinLockScreenState extends State<PinLockScreen> with SingleTickerProvider
   String _getSubtitle() {
     switch (widget.mode) {
       case PinLockMode.unlock:
-        return 'Masukkan 4-digit PIN untuk membuka brankas keuangan Anda';
+        return 'Masukkan PIN Pengaman Anda';
       case PinLockMode.setup:
         return _step == 0
             ? 'Tentukan 4 digit angka rahasia'

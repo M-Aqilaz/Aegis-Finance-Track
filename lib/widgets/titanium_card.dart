@@ -367,7 +367,7 @@ class TitaniumCard extends StatelessWidget {
                         ),
                         const SizedBox(height: 1),
                         const Text(
-                          'AZURE • PHOENIX GUARDIAN',
+                          'M.AQILAZ • PHOENIX GUARDIAN',
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: 12,

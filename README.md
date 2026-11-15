@@ -146,5 +146,5 @@ Distributed under the MIT License. See `LICENSE` for more information.
 ---
 
 <p align="center">
-  Crafted with care by <strong>Azure</strong> • <em>Protected by the Cyber-Phoenix Guardian</em> 🦅
+  Crafted with care by <strong>M.Aqilaz</strong> • <em>Protected by the Cyber-Phoenix Guardian</em> 🦅
 </p>

@@ -45,7 +45,7 @@ void main() {
     test('End-to-end output matches user ledger exactly per day', () async {
       SharedPreferences.setMockInitialValues({});
       final storage = StorageService();
-      await storage.init();
+      await storage.init(loadSampleDataIfEmpty: true);
 
       // Verify the list has all 8 days
       expect(storage.entries.length, 8);
@@ -127,7 +127,7 @@ void main() {
     test('UI Display Order: Dashboard and History always show latest date (10 Nov) first', () async {
       SharedPreferences.setMockInitialValues({});
       final storage = StorageService();
-      await storage.init();
+      await storage.init(loadSampleDataIfEmpty: true);
 
       final displayEntries = List<DayEntry>.from(storage.entries)
         ..sort((a, b) => b.date.compareTo(a.date));
@@ -142,7 +142,7 @@ void main() {
     test('User draws 50k from Tabungan into SeaBank', () async {
       SharedPreferences.setMockInitialValues({});
       final storage = StorageService();
-      await storage.init();
+      await storage.init(loadSampleDataIfEmpty: true);
 
       expect(storage.savingsBalance, 180000);
       expect(storage.seaBankBalance, 143000);
@@ -171,7 +171,7 @@ void main() {
     test('Export produces valid JSON and Import restores full state without loss', () async {
       SharedPreferences.setMockInitialValues({});
       final storage = StorageService();
-      await storage.init();
+      await storage.init(loadSampleDataIfEmpty: true);
 
       final jsonStr = storage.exportJson();
       expect(jsonStr.isNotEmpty, isTrue);
@@ -195,7 +195,7 @@ void main() {
     test('User streak updates automatically when new daily entry is saved', () async {
       SharedPreferences.setMockInitialValues({});
       final storage = StorageService();
-      await storage.init();
+      await storage.init(loadSampleDataIfEmpty: true);
 
       expect(storage.streakInfo.longestStreak, 8);
 
