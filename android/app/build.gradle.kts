@@ -18,14 +18,32 @@ android {
     defaultConfig {
         applicationId = "com.financialtrack.financial_track"
         minSdk = flutter.minSdkVersion
-        targetSdk = flutter.targetSdkVersion
+        targetSdk = 34
         versionCode = flutter.versionCode
         versionName = flutter.versionName
     }
 
+    val keystoreFile = file("aegis-release-key.jks")
+    signingConfigs {
+        if (keystoreFile.exists()) {
+            create("release") {
+                keyAlias = "aegis"
+                keyPassword = "aegisfinance"
+                storeFile = keystoreFile
+                storePassword = "aegisfinance"
+                enableV1Signing = true
+                enableV2Signing = true
+            }
+        }
+    }
+
     buildTypes {
         release {
-            signingConfig = signingConfigs.getByName("debug")
+            if (keystoreFile.exists()) {
+                signingConfig = signingConfigs.getByName("release")
+            } else {
+                signingConfig = signingConfigs.getByName("debug")
+            }
         }
     }
 }
