@@ -365,8 +365,8 @@ class _AssetScreenState extends State<AssetScreen> {
         ),
         const SizedBox(height: 12),
         Container(
-          height: 220,
-          padding: const EdgeInsets.fromLTRB(12, 16, 16, 10),
+          height: 230,
+          padding: const EdgeInsets.fromLTRB(8, 16, 12, 12),
           decoration: AppTheme.glassCardDecoration(borderRadius: 20),
           child: !hasData
               ? Center(
@@ -406,20 +406,33 @@ class _AssetScreenState extends State<AssetScreen> {
                       bottomTitles: AxisTitles(
                         sideTitles: SideTitles(
                           showTitles: true,
-                          reservedSize: 22,
-                          interval: spots.length > 5 ? (spots.length / 3).floorToDouble() : 1,
+                          reservedSize: 28,
+                          interval: spots.length > 6
+                              ? (spots.length / 4).ceilToDouble()
+                              : spots.length > 3
+                                  ? 2
+                                  : 1,
                           getTitlesWidget: (value, meta) {
                             final idx = value.toInt();
-                            if (idx < 0 || idx >= entries.length) {
+                            // Skip first and last to prevent edge clipping
+                            if (idx < 0 ||
+                                idx >= entries.length ||
+                                value == meta.min ||
+                                value == meta.max) {
                               return const SizedBox.shrink();
                             }
-                            return Padding(
-                              padding: const EdgeInsets.only(top: 4),
+                            return SideTitleWidget(
+                              meta: meta,
+                              fitInside: SideTitleFitInsideData.fromTitleMeta(
+                                meta,
+                                enabled: true,
+                                distanceFromEdge: 2,
+                              ),
                               child: Text(
                                 DateFormat('d MMM').format(entries[idx].date),
                                 style: TextStyle(
                                   color: Colors.grey[500],
-                                  fontSize: 10,
+                                  fontSize: 9,
                                   fontWeight: FontWeight.w500,
                                 ),
                               ),
