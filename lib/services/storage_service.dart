@@ -42,7 +42,7 @@ class StorageService extends ChangeNotifier {
   static const String _kPrivacyModeKey = 'pref_privacy_mode';
   static const String _kPinEnabledKey = 'pref_pin_enabled';
   static const String _kPinCodeKey = 'pref_pin_code';
-  static const String _kBiometricsEnabledKey = 'pref_biometrics_enabled';
+  // _kBiometricsEnabledKey removed — biometric feature not implemented
   static const String _kHasSeenOnboardingKey = 'pref_has_seen_onboarding';
 
   final List<DayEntry> _entries = [];
@@ -52,7 +52,6 @@ class StorageService extends ChangeNotifier {
   bool _privacyMode = false;
   bool _pinEnabled = false;
   String _pinCode = '';
-  bool _biometricsEnabled = true;
   bool _isAppLocked = false;
   bool _hasSeenOnboarding = false;
 
@@ -71,7 +70,6 @@ class StorageService extends ChangeNotifier {
   bool get privacyMode => _privacyMode;
   bool get pinEnabled => _pinEnabled;
   bool get isAppLocked => _isAppLocked;
-  bool get biometricsEnabled => _biometricsEnabled;
   bool get hasPinSet => _pinCode.isNotEmpty;
   bool get reminderEnabled => _reminderEnabled;
   int get reminderHour => _reminderHour;
@@ -116,13 +114,6 @@ class StorageService extends ChangeNotifier {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(_kPinCodeKey);
     await prefs.setBool(_kPinEnabledKey, false);
-    notifyListeners();
-  }
-
-  Future<void> toggleBiometrics(bool enabled) async {
-    _biometricsEnabled = enabled;
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool(_kBiometricsEnabledKey, enabled);
     notifyListeners();
   }
 
@@ -248,7 +239,6 @@ class StorageService extends ChangeNotifier {
     _bankJagoBalance = prefs.getDouble(_kBankJagoBalanceKey) ?? 0.0;
     _pinEnabled = prefs.getBool(_kPinEnabledKey) ?? false;
     _pinCode = prefs.getString(_kPinCodeKey) ?? '';
-    _biometricsEnabled = prefs.getBool(_kBiometricsEnabledKey) ?? true;
     _hasSeenOnboarding = prefs.getBool(_kHasSeenOnboardingKey) ?? false;
     if (_pinEnabled && _pinCode.isNotEmpty) {
       _isAppLocked = true;
@@ -355,11 +345,6 @@ class StorageService extends ChangeNotifier {
 
     _recalculateBalances();
     notifyListeners();
-  }
-
-  /// Reset to the official sample dataset
-  Future<void> resetToOfficialSeedData() async {
-    await loadSampleDemoData();
   }
 
   void _loadSeedData() {

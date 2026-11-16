@@ -4,6 +4,7 @@ import '../utils/app_theme.dart';
 import '../utils/currency_formatter.dart';
 import '../widgets/asset_dialogs.dart';
 import '../widgets/financial_rings_card.dart';
+import '../widgets/leak_analysis_card.dart';
 import '../widgets/quick_log_bottom_sheet.dart';
 import '../widgets/titanium_card.dart';
 import '../widgets/transfer_dialog.dart';
@@ -399,7 +400,26 @@ class HomeScreen extends StatelessWidget {
 
                       const SizedBox(height: 18),
 
-                      // 4. Prominent Integrated Quick Log Action Button
+                      // 4. Leak Analysis (expense pattern detector)
+                      if (storageService.entries.isNotEmpty) ...[
+                        const Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            'ANALISIS KEUANGAN',
+                            style: TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: 1.2,
+                              color: Colors.white54,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        LeakAnalysisCard(entries: storageService.entries.toList()),
+                        const SizedBox(height: 18),
+                      ],
+
+                      // 5. Prominent Integrated Quick Log Action Button
                       InkWell(
                         onTap: () => QuickLogBottomSheet.show(context, storageService: storageService),
                         borderRadius: BorderRadius.circular(16),

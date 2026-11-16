@@ -74,6 +74,19 @@ extension ExpenseCategoryExtension on ExpenseCategory {
         return const Color(0xFF6B7280); // Gray
     }
   }
+
+  String get emoji {
+    switch (this) {
+      case ExpenseCategory.makanan:   return '🍱';
+      case ExpenseCategory.jajan:     return '☕';
+      case ExpenseCategory.transport: return '🚗';
+      case ExpenseCategory.belanja:   return '🛍️';
+      case ExpenseCategory.tagihan:   return '📱';
+      case ExpenseCategory.hiburan:   return '🎮';
+      case ExpenseCategory.darurat:   return '🚨';
+      case ExpenseCategory.lainnya:   return '📦';
+    }
+  }
 }
 
 class ExpenseItem {

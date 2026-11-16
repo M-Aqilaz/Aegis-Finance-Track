@@ -543,5 +543,29 @@ void main() {
       expect(storage.bankJagoBalance, 0.0);
       expect(storage.totalAllAssets, 0.0);
     });
+
+    test('CSV Generation: Produces clean header and valid rows', () async {
+      SharedPreferences.setMockInitialValues({});
+      final storage = StorageService();
+      await storage.init(loadSampleDataIfEmpty: true);
+
+      final csv = BackupService.generateCsv(storage);
+      expect(csv.startsWith('Tanggal,Pemasukan,Pengeluaran,Simpan,Sisa,Total Simpan'), isTrue);
+      expect(csv.contains('03/11/2026,40000,18000,5000,17000,5000'), isTrue);
+      expect(csv.contains('10/11/2026,25000,5000,10000,77000,18000'), isTrue);
+    });
+
+    test('ThemeMode: Toggling persists in storage and notifies listeners', () async {
+      SharedPreferences.setMockInitialValues({});
+      final storage = StorageService();
+      await storage.init();
+
+      expect(storage.themeMode, 'dark'); // Default
+      await storage.updateSettings(themeMode: 'light');
+      expect(storage.themeMode, 'light');
+
+      await storage.updateSettings(themeMode: 'dark');
+      expect(storage.themeMode, 'dark');
+    });
   });
 }

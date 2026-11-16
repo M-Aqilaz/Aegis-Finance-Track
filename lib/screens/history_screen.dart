@@ -228,21 +228,71 @@ class _HistoryScreenState extends State<HistoryScreen> {
                         itemCount: filtered.length,
                         itemBuilder: (context, index) {
                           final entry = filtered[index];
-                          return DailyEntryCard(
-                            entry: entry,
-                            activeFilter: _filterType,
-                            onEdit: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => AddEditEntryScreen(
-                                    storageService: widget.storageService,
-                                    existingEntry: entry,
+                          return Dismissible(
+                            key: ValueKey(entry.id),
+                            direction: DismissDirection.endToStart,
+                            background: Container(
+                              margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+                              decoration: BoxDecoration(
+                                color: Colors.red.shade700,
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                              alignment: Alignment.centerRight,
+                              padding: const EdgeInsets.only(right: 20),
+                              child: const Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(Icons.delete_outline, color: Colors.white, size: 26),
+                                  SizedBox(height: 4),
+                                  Text('Hapus', style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold)),
+                                ],
+                              ),
+                            ),
+                            confirmDismiss: (_) async {
+                              return await showDialog<bool>(
+                                context: context,
+                                builder: (ctx) => AlertDialog(
+                                  title: const Text('Hapus Catatan?'),
+                                  content: Text(
+                                    'Catatan tanggal ${CurrencyFormatter.formatDate(entry.date)} akan dihapus. Perhitungan Sisa & Total Simpan akan otomatis diperbarui.',
                                   ),
+                                  actions: [
+                                    TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Batal')),
+                                    ElevatedButton(
+                                      style: ElevatedButton.styleFrom(backgroundColor: Colors.red, foregroundColor: Colors.white),
+                                      onPressed: () => Navigator.pop(ctx, true),
+                                      child: const Text('Hapus'),
+                                    ),
+                                  ],
+                                ),
+                              ) ?? false;
+                            },
+                            onDismissed: (_) {
+                              widget.storageService.deleteEntry(entry.id);
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text('Catatan ${CurrencyFormatter.formatDate(entry.date)} dihapus'),
+                                  backgroundColor: Colors.red.shade700,
+                                  duration: const Duration(seconds: 2),
                                 ),
                               );
                             },
-                            onDelete: () => _confirmDelete(context, entry),
+                            child: DailyEntryCard(
+                              entry: entry,
+                              activeFilter: _filterType,
+                              onEdit: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => AddEditEntryScreen(
+                                      storageService: widget.storageService,
+                                      existingEntry: entry,
+                                    ),
+                                  ),
+                                );
+                              },
+                              onDelete: () => _confirmDelete(context, entry),
+                            ),
                           );
                         },
                       ),

@@ -29,20 +29,40 @@ void main() async {
   runApp(AegisFinanceApp(storageService: storageService));
 }
 
-class AegisFinanceApp extends StatelessWidget {
+class AegisFinanceApp extends StatefulWidget {
   final StorageService storageService;
 
   const AegisFinanceApp({super.key, required this.storageService});
 
   @override
+  State<AegisFinanceApp> createState() => _AegisFinanceAppState();
+}
+
+class _AegisFinanceAppState extends State<AegisFinanceApp> {
+  @override
+  void initState() {
+    super.initState();
+    widget.storageService.addListener(_onStorageChanged);
+  }
+
+  @override
+  void dispose() {
+    widget.storageService.removeListener(_onStorageChanged);
+    super.dispose();
+  }
+
+  void _onStorageChanged() => setState(() {});
+
+  @override
   Widget build(BuildContext context) {
+    final isDark = widget.storageService.themeMode != 'light';
     return MaterialApp(
       title: 'Aegis Finance',
       debugShowCheckedModeBanner: false,
-      themeMode: ThemeMode.dark, // Signature Obsidian Neo-Mint Mode
-      theme: AppTheme.darkTheme,
+      themeMode: isDark ? ThemeMode.dark : ThemeMode.light,
+      theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
-      home: MainNavigationScreen(storageService: storageService),
+      home: MainNavigationScreen(storageService: widget.storageService),
     );
   }
 }

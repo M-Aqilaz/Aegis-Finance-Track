@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../services/backup_service.dart';
 import '../services/notification_service.dart';
 import '../services/storage_service.dart';
 import '../utils/app_theme.dart';
@@ -197,6 +198,29 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
           const SizedBox(height: 24),
 
+          // TAMPILAN SECTION
+          _buildHeader('TAMPILAN', Icons.palette_outlined),
+          Card(
+            child: SwitchListTile(
+              secondary: Icon(
+                s.themeMode == 'light' ? Icons.light_mode_rounded : Icons.dark_mode_rounded,
+                color: s.themeMode == 'light' ? AppTheme.solarAmber : AppTheme.electricCyan,
+              ),
+              title: const Text('Tema Terang (Light Mode)', style: TextStyle(fontWeight: FontWeight.w600)),
+              subtitle: Text(
+                s.themeMode == 'light' ? 'Aktif — tampilan putih bersih' : 'Nonaktif — Obsidian gelap (default)',
+                style: const TextStyle(fontSize: 12),
+              ),
+              value: s.themeMode == 'light',
+              activeThumbColor: AppTheme.solarAmber,
+              onChanged: (val) async {
+                await s.updateSettings(themeMode: val ? 'light' : 'dark');
+              },
+            ),
+          ),
+
+          const SizedBox(height: 24),
+
           // NOTIFICATION SECTION
           _buildHeader('PENGINGAT & NOTIFIKASI', Icons.notifications_active_outlined),
           Card(
@@ -241,6 +265,23 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   subtitle: const Text('Simpan/pulihkan file cadangan atau kirim kode via WA', style: TextStyle(fontSize: 12)),
                   trailing: const Icon(Icons.arrow_forward_ios, size: 14),
                   onTap: () => HistoryRecapDialog.show(context, widget.storageService),
+                ),
+                const Divider(height: 1),
+                ListTile(
+                  leading: const Icon(Icons.table_chart_outlined, color: Color(0xFF10B981)),
+                  title: const Text('Export ke CSV (Excel)', style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF10B981))),
+                  subtitle: const Text('Buka di Excel / Google Sheets', style: TextStyle(fontSize: 12)),
+                  trailing: const Icon(Icons.download_rounded, color: Color(0xFF10B981), size: 20),
+                  onTap: () async {
+                    final messenger = ScaffoldMessenger.of(context);
+                    final ok = await BackupService.exportCsvFile(widget.storageService);
+                    if (mounted) {
+                      messenger.showSnackBar(SnackBar(
+                        content: Text(ok ? '✅ File CSV berhasil disimpan/dibagikan!' : '❌ Gagal export CSV.'),
+                        backgroundColor: ok ? const Color(0xFF10B981) : Colors.red,
+                      ));
+                    }
+                  },
                 ),
                 const Divider(height: 1),
                 ListTile(

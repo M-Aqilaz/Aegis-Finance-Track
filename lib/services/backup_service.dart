@@ -137,6 +137,62 @@ class BackupService {
     }
   }
 
+  /// Generates CSV string format of ledger entries
+  static String generateCsv(StorageService storage) {
+    final entries = List<DayEntry>.from(storage.entries)
+      ..sort((a, b) => a.date.compareTo(b.date));
+
+    final buffer = StringBuffer();
+    // Header row
+    buffer.writeln('Tanggal,Pemasukan,Pengeluaran,Simpan,Sisa,Total Simpan,Catatan Pemasukan,Catatan Simpan,Rincian Pengeluaran');
+
+    for (final e in entries) {
+      final date = '${e.date.day.toString().padLeft(2, '0')}/${e.date.month.toString().padLeft(2, '0')}/${e.date.year}';
+      final expDetail = e.expenses.isNotEmpty
+          ? e.expenses.map((x) => '${x.title}(${x.amount.toStringAsFixed(0)})').join(' | ')
+          : e.directExpense > 0 ? 'Pengeluaran(${e.directExpense.toStringAsFixed(0)})' : '-';
+      final row = [
+        date,
+        e.income.toStringAsFixed(0),
+        e.totalExpense.toStringAsFixed(0),
+        e.saveAmount.toStringAsFixed(0),
+        e.runningSisa.toStringAsFixed(0),
+        e.runningTotalSimpan.toStringAsFixed(0),
+        _csvEscape(e.incomeNote),
+        _csvEscape(e.saveNote),
+        _csvEscape(expDetail),
+      ].join(',');
+      buffer.writeln(row);
+    }
+
+    return buffer.toString();
+  }
+
+  /// Exports data as CSV (compatible with Excel / Google Sheets)
+  static Future<bool> exportCsvFile(StorageService storage) async {
+    try {
+      final csvContent = generateCsv(storage);
+      final nowStr = DateTime.now().toIso8601String().substring(0, 10);
+      final fileName = 'FinancialTrack_$nowStr.csv';
+
+      return await FileSaverPlatform.saveOrShareFile(
+        fileName: fileName,
+        content: csvContent,
+        mimeType: 'text/csv',
+      );
+    } catch (e) {
+      debugPrint('Export CSV error: $e');
+      return false;
+    }
+  }
+
+  static String _csvEscape(String value) {
+    if (value.contains(',') || value.contains('"') || value.contains('\n')) {
+      return '"${value.replaceAll('"', '""')}"';
+    }
+    return value.isEmpty ? '-' : value;
+  }
+
   /// Opens the native file picker to select a .json backup file
   static Future<String?> pickBackupFile() async {
     try {
