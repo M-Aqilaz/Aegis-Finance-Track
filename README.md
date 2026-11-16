@@ -43,46 +43,7 @@ Tidak perlu setup Flutter atau compile source code dari nol. Unduh APK resmi dan
 
 ---
 
-## 📱 Visual Showcase & Antarmuka Aplikasi
-
-Tampilan antarmuka *Obsidian Cosmic* v1.1 dengan visual kontras tinggi, typography modern, mode terang/gelap, dan detektor kebocoran finansial:
-
-<table align="center">
-  <tr>
-    <td align="center"><b>🚀 Onboarding Experience</b></td>
-    <td align="center"><b>💳 Beranda (Net Worth & Cincin)</b></td>
-    <td align="center"><b>🔍 Detektor Kebocoran Finansial</b></td>
-  </tr>
-  <tr>
-    <td><img src="docs/screenshots/aegis_onboarding_preview.png" width="220" alt="Onboarding Screen"/></td>
-    <td><img src="docs/screenshots/aegis_finance_preview.png" width="220" alt="Beranda Screen"/></td>
-    <td><img src="docs/screenshots/aegis_leak_detector_preview.png" width="220" alt="Detektor Kebocoran Finansial"/></td>
-  </tr>
-  <tr>
-    <td align="center"><b>📊 Kantong Aset & Donut</b></td>
-    <td align="center"><b>📈 Kurva Pertumbuhan Tabungan</b></td>
-    <td align="center"><b>📅 Riwayat & Swipe-to-Delete</b></td>
-  </tr>
-  <tr>
-    <td><img src="docs/screenshots/aegis_asset_preview.png" width="220" alt="Kantong Aset Screen"/></td>
-    <td><img src="docs/screenshots/aegis_savings_chart_preview.png" width="220" alt="Kurva Pertumbuhan Tabungan"/></td>
-    <td><img src="docs/screenshots/aegis_history_preview.png" width="220" alt="Riwayat Screen"/></td>
-  </tr>
-  <tr>
-    <td align="center"><b>⚙️ Pengaturan & Export CSV</b></td>
-    <td align="center"><b>🌗 Mode Bersih Terang (Light Mode)</b></td>
-    <td align="center"><b>🔒 PIN Security Vault</b></td>
-  </tr>
-  <tr>
-    <td><img src="docs/screenshots/aegis_settings_preview.png" width="220" alt="Pengaturan & Export CSV"/></td>
-    <td><img src="docs/screenshots/aegis_light_home_preview.png" width="220" alt="Light Mode Screen"/></td>
-    <td><img src="docs/screenshots/aegis_pin_lock_preview.png" width="220" alt="PIN Vault Screen"/></td>
-  </tr>
-</table>
-
----
-
-## 🗺️ Visual Overview & Arsitektur Fitur
+## 🗺️ Arsitektur & Alur Modul Aplikasi
 
 Aegis Finance dirancang dengan pemisahan peran yang tegas dan bersih tanpa elemen visual yang menumpuk:
 
