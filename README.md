@@ -25,7 +25,7 @@ Tidak perlu setup Flutter atau compile source code dari nol. Unduh APK resmi dan
 
 <p align="center">
   <a href="https://github.com/M-Aqilaz/Aegis-Finance-Track/releases/latest/download/AegisFinance-v1.1-arm64.apk">
-    <img src="https://img.shields.io/badge/Download_APK_Ringan-~17_MB_(ARM64)-00F59B?style=for-the-badge&logo=android&logoColor=0B0F17" alt="Download APK Ringan (ARM64)"/>
+    <img src="https://img.shields.io/badge/Download_APK_Ringan-21_MB_(ARM64)-00F59B?style=for-the-badge&logo=android&logoColor=0B0F17" alt="Download APK Ringan (ARM64)"/>
   </a>
   &nbsp;&nbsp;
   <a href="https://github.com/M-Aqilaz/Aegis-Finance-Track/releases/latest/download/AegisFinance-Universal.apk">
@@ -33,7 +33,7 @@ Tidak perlu setup Flutter atau compile source code dari nol. Unduh APK resmi dan
   </a>
 </p>
 
-> **💡 Rekomendasi:** Unduh versi **ARM64 (~17 MB)** untuk HP Android modern (98%+ pengguna). Unduh versi **Universal** jika Anda menggunakan HP Android lama (32-bit).
+> **💡 Rekomendasi:** Unduh versi **ARM64 (~21 MB)** untuk HP Android modern (98%+ pengguna). Unduh versi **Universal** jika Anda menggunakan HP Android lama (32-bit).
 >
 > **Panduan Install 3 Langkah:**
 > 1. Klik tombol **Download APK** di atas (atau via [GitHub Releases](https://github.com/M-Aqilaz/Aegis-Finance-Track/releases/latest)).
@@ -42,22 +42,56 @@ Tidak perlu setup Flutter atau compile source code dari nol. Unduh APK resmi dan
 
 ---
 
-## 📱 Visual Showcase
+## 📱 Visual Showcase & Antarmuka Aplikasi
+
+Tampilan antarmuka *Obsidian Cosmic* v1.1 dengan visual kontras tinggi, typography modern, dan navigasi pulau mengambang (*Floating Island*):
 
 <table align="center">
   <tr>
-    <td align="center"><b>Beranda (Net Worth)</b></td>
-    <td align="center"><b>Riwayat & Filter</b></td>
-    <td align="center"><b>Pengaturan & Cadangan</b></td>
-    <td align="center"><b>PIN Security Vault</b></td>
+    <td align="center"><b>🚀 Onboarding Experience</b></td>
+    <td align="center"><b>💳 Beranda (Net Worth & Cincin)</b></td>
+    <td align="center"><b>📊 Kantong Aset & Donut</b></td>
   </tr>
   <tr>
-    <td><img src="docs/screenshots/aegis_finance_preview.png" width="190"/></td>
-    <td><img src="docs/screenshots/aegis_history_preview.png" width="190"/></td>
-    <td><img src="docs/screenshots/aegis_settings_preview.png" width="190"/></td>
-    <td><img src="docs/screenshots/aegis_pin_lock_preview.png" width="190"/></td>
+    <td><img src="docs/screenshots/aegis_onboarding_preview.png" width="220" alt="Onboarding Screen"/></td>
+    <td><img src="docs/screenshots/aegis_finance_preview.png" width="220" alt="Beranda Screen"/></td>
+    <td><img src="docs/screenshots/aegis_asset_preview.png" width="220" alt="Kantong Aset Screen"/></td>
+  </tr>
+  <tr>
+    <td align="center"><b>📅 Riwayat & Filter Simpan</b></td>
+    <td align="center"><b>⚙️ Pengaturan & Pusat Cadangan</b></td>
+    <td align="center"><b>🔒 PIN Security Vault</b></td>
+  </tr>
+  <tr>
+    <td><img src="docs/screenshots/aegis_history_preview.png" width="220" alt="Riwayat Screen"/></td>
+    <td><img src="docs/screenshots/aegis_settings_preview.png" width="220" alt="Pengaturan Screen"/></td>
+    <td><img src="docs/screenshots/aegis_pin_lock_preview.png" width="220" alt="PIN Vault Screen"/></td>
   </tr>
 </table>
+
+---
+
+## 🗺️ Visual Overview & Arsitektur Fitur
+
+Aegis Finance dirancang dengan pemisahan peran yang tegas dan bersih tanpa elemen visual yang menumpuk:
+
+```mermaid
+flowchart LR
+    A["🚀 Onboarding<br/>(First Launch)"] --> B["💳 Beranda<br/>Net Worth & Cincin"]
+    B <--> C["📊 Kantong Aset<br/>Donut & Kurva Tabungan"]
+    B <--> D["📅 Riwayat Transaksi<br/>Filter & Expandable Cards"]
+    B <--> E["⚙️ Pengaturan<br/>Pusat Cadangan & Vault"]
+    E -.-> F["🔒 Aegis Vault PIN<br/>(4-Digit & Biometric)"]
+```
+
+| Modul Visual | Peran & Pengalaman Pengguna |
+|---|---|
+| **🚀 Onboarding Experience** | 3 slide kosmik yang memperkenalkan filosofi *Obsidian Guardian*, privasi *offline-first*, dan cincin aktivitas Apple Watch tanpa perlu login. |
+| **💳 Beranda (Net Worth & Trio Rings)** | Kartu eksekutif Black Titanium dengan auto-scaling saldo (hingga Triliun), pemantauan saldo kas cair harian, brankas tabungan, dan trio cincin konsistensi. |
+| **📊 Kantong Aset & Analisis** | Visualisasi donat proporsi aset (Cash, Tabungan, SeaBank, Bank Jago, dompet custom), tombol transfer cepat antar-kantong, dan **Kurva Akumulasi Tabungan**. |
+| **📅 Riwayat Transaksi** | Catatan pembukuan per tanggal yang rapi, tombol filter chip (*Semua, Pengeluaran, Pemasukan, Simpan*), dan rincian transaksi harian yang dapat diperluas. |
+| **⚙️ Pengaturan & Pusat Cadangan** | Pengaturan pengingat harian jam 20:00 WIB, sensor privasi samaran, serta **Pusat Cadangan & Pindah HP** satu pintu (ekspor file atau salin kode via WhatsApp). |
+| **🔒 Aegis Security Vault** | Layar kunci PIN 4-digit taktil dengan dukungan sensor sidik jari/Face ID dan auto-lock seketika saat aplikasi diminimalkan. |
 
 ---
 
