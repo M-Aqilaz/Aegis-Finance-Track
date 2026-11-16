@@ -13,7 +13,7 @@ void main() async {
 
   // Initialize services
   final storageService = StorageService();
-  await storageService.init();
+  await storageService.init(loadSampleDataIfEmpty: true);
 
   final notificationService = NotificationService();
   await notificationService.init();
