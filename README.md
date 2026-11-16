@@ -12,7 +12,8 @@
 <p align="center">
   <img src="https://img.shields.io/badge/Flutter-3.x-02569B?logo=flutter" alt="Flutter"/>
   <img src="https://img.shields.io/badge/Dart-3.x-0175C2?logo=dart" alt="Dart"/>
-  <img src="https://img.shields.io/badge/Tests-29%2F29%20Passed-10B981" alt="Tests"/>
+  <img src="https://img.shields.io/badge/Tests-31%2F31%20Passed-10B981" alt="Tests"/>
+  <img src="https://img.shields.io/badge/Theme-Dark%20%26%20Light-8B5CF6" alt="Theme"/>
   <img src="https://img.shields.io/badge/Privacy-100%25%20Offline--First-00F59B" alt="Privacy"/>
   <img src="https://img.shields.io/badge/License-MIT-F59E0B" alt="License"/>
 </p>
@@ -44,27 +45,37 @@ Tidak perlu setup Flutter atau compile source code dari nol. Unduh APK resmi dan
 
 ## 📱 Visual Showcase & Antarmuka Aplikasi
 
-Tampilan antarmuka *Obsidian Cosmic* v1.1 dengan visual kontras tinggi, typography modern, dan navigasi pulau mengambang (*Floating Island*):
+Tampilan antarmuka *Obsidian Cosmic* v1.1 dengan visual kontras tinggi, typography modern, mode terang/gelap, dan detektor kebocoran finansial:
 
 <table align="center">
   <tr>
     <td align="center"><b>🚀 Onboarding Experience</b></td>
     <td align="center"><b>💳 Beranda (Net Worth & Cincin)</b></td>
-    <td align="center"><b>📊 Kantong Aset & Donut</b></td>
+    <td align="center"><b>🔍 Detektor Kebocoran Finansial</b></td>
   </tr>
   <tr>
     <td><img src="docs/screenshots/aegis_onboarding_preview.png" width="220" alt="Onboarding Screen"/></td>
     <td><img src="docs/screenshots/aegis_finance_preview.png" width="220" alt="Beranda Screen"/></td>
-    <td><img src="docs/screenshots/aegis_asset_preview.png" width="220" alt="Kantong Aset Screen"/></td>
+    <td><img src="docs/screenshots/aegis_leak_detector_preview.png" width="220" alt="Detektor Kebocoran Finansial"/></td>
   </tr>
   <tr>
-    <td align="center"><b>📅 Riwayat & Filter Simpan</b></td>
-    <td align="center"><b>⚙️ Pengaturan & Pusat Cadangan</b></td>
+    <td align="center"><b>📊 Kantong Aset & Donut</b></td>
+    <td align="center"><b>📈 Kurva Pertumbuhan Tabungan</b></td>
+    <td align="center"><b>📅 Riwayat & Swipe-to-Delete</b></td>
+  </tr>
+  <tr>
+    <td><img src="docs/screenshots/aegis_asset_preview.png" width="220" alt="Kantong Aset Screen"/></td>
+    <td><img src="docs/screenshots/aegis_savings_chart_preview.png" width="220" alt="Kurva Pertumbuhan Tabungan"/></td>
+    <td><img src="docs/screenshots/aegis_history_preview.png" width="220" alt="Riwayat Screen"/></td>
+  </tr>
+  <tr>
+    <td align="center"><b>⚙️ Pengaturan & Export CSV</b></td>
+    <td align="center"><b>🌗 Mode Bersih Terang (Light Mode)</b></td>
     <td align="center"><b>🔒 PIN Security Vault</b></td>
   </tr>
   <tr>
-    <td><img src="docs/screenshots/aegis_history_preview.png" width="220" alt="Riwayat Screen"/></td>
-    <td><img src="docs/screenshots/aegis_settings_preview.png" width="220" alt="Pengaturan Screen"/></td>
+    <td><img src="docs/screenshots/aegis_settings_preview.png" width="220" alt="Pengaturan & Export CSV"/></td>
+    <td><img src="docs/screenshots/aegis_light_home_preview.png" width="220" alt="Light Mode Screen"/></td>
     <td><img src="docs/screenshots/aegis_pin_lock_preview.png" width="220" alt="PIN Vault Screen"/></td>
   </tr>
 </table>
@@ -77,21 +88,21 @@ Aegis Finance dirancang dengan pemisahan peran yang tegas dan bersih tanpa eleme
 
 ```mermaid
 flowchart LR
-    A["🚀 Onboarding<br/>(First Launch)"] --> B["💳 Beranda<br/>Net Worth & Cincin"]
+    A["🚀 Onboarding<br/>(First Launch)"] --> B["💳 Beranda<br/>Net Worth, Cincin & Detektor Kebocoran"]
     B <--> C["📊 Kantong Aset<br/>Donut & Kurva Tabungan"]
-    B <--> D["📅 Riwayat Transaksi<br/>Filter & Expandable Cards"]
-    B <--> E["⚙️ Pengaturan<br/>Pusat Cadangan & Vault"]
+    B <--> D["📅 Riwayat Transaksi<br/>Filter & Swipe-to-Delete"]
+    B <--> E["⚙️ Pengaturan<br/>Light/Dark, Export CSV & Vault"]
     E -.-> F["🔒 Aegis Vault PIN<br/>(4-Digit Secure PIN)"]
 ```
 
 | Modul Visual | Peran & Pengalaman Pengguna |
 |---|---|
 | **🚀 Onboarding Experience** | 3 slide kosmik yang memperkenalkan filosofi *Obsidian Guardian*, privasi *offline-first*, dan cincin aktivitas Apple Watch tanpa perlu login. |
-| **💳 Beranda (Net Worth & Trio Rings)** | Kartu eksekutif Black Titanium dengan auto-scaling saldo (hingga Triliun), pemantauan saldo kas cair harian, brankas tabungan, dan trio cincin konsistensi. |
-| **📊 Kantong Aset & Analisis** | Visualisasi donat proporsi aset (Cash, Tabungan, SeaBank, Bank Jago, dompet custom), tombol transfer cepat antar-kantong, dan **Kurva Akumulasi Tabungan**. |
-| **📅 Riwayat Transaksi** | Catatan pembukuan per tanggal yang rapi, tombol filter chip (*Semua, Pengeluaran, Pemasukan, Simpan*), dan rincian transaksi harian yang dapat diperluas. |
-| **⚙️ Pengaturan & Pusat Cadangan** | Pengaturan pengingat harian jam 20:00 WIB, sensor privasi samaran, serta **Pusat Cadangan & Pindah HP** satu pintu (ekspor file atau salin kode via WhatsApp). |
-| **🔒 Aegis Security Vault** | Layar kunci PIN 4-digit taktil dengan indikator dot dan auto-lock seketika saat aplikasi diminimalkan. |
+| **💳 Beranda (Net Worth & Trio Rings)** | Kartu eksekutif Black Titanium dengan auto-scaling saldo (hingga Triliun), pemantauan saldo kas cair harian, brankas tabungan, trio cincin konsistensi, dan **Detektor Kebocoran Finansial**. |
+| **📊 Kantong Aset & Analisis** | Visualisasi donat proporsi aset (Cash, Tabungan, SeaBank, Bank Jago, dompet custom), tombol transfer cepat antar-kantong, dan **Kurva Akumulasi Tabungan** dengan label sumbu waktu yang presisi. |
+| **📅 Riwayat Transaksi** | Catatan pembukuan per tanggal yang rapi, tombol filter chip (*Semua, Pengeluaran, Pemasukan, Simpan*), dan gestur **Swipe-to-Delete** cepat dengan konfirmasi pengaman. |
+| **⚙️ Pengaturan & Pusat Cadangan** | Pengaturan **Mode Terang/Gelap (Light/Dark Theme)**, pengingat harian jam 20:00 WIB, sensor privasi samaran, **Ekspor Riwayat ke Format CSV (Excel)**, serta Pusat Cadangan & Pindah HP. |
+| **🔒 Aegis Security Vault** | Layar kunci PIN 4-digit taktil dengan indikator dot simetris dan auto-lock seketika saat aplikasi diminimalkan. |
 
 ---
 
@@ -99,30 +110,40 @@ flowchart LR
 
 * 🚀 **Obsidian Onboarding Experience**: Panduan pengenalan 3-slide visual kosmik yang mulus untuk pengguna baru saat pertama kali membuka aplikasi.
 * 💳 **Black Titanium Card & Multi-Pocket**: Pantau kekayaan riil (*Net Worth*), sisa kas harian, tabungan vault, dan rekening bank (SeaBank, Bank Jago, dll) lengkap dengan fitur transfer dana antar kantong.
+* 🔍 **Detektor Kebocoran Finansial (Financial Leak Detector)**: Analisis otomatis rasio pengeluaran vs tabungan harian, visualisasi breakdown kategori pos pengeluaran teratas, serta rekomendasi actionable untuk memangkas *bocor halus* (seperti kopi & jajan harian).
+* 🌗 **Mode Terang & Gelap (Light & Dark Mode)**: Fleksibilitas tampilan penuh antara tema *Obsidian Cosmic* gelap elegan (default) dan tema *Light Mode* putih bersih untuk kenyamanan penggunaan di luar ruangan.
+* 📊 **Ekspor Riwayat ke Format CSV (Excel Compatible)**: Ekspor seluruh transaksi dan buku kas ke file `.csv` standar hanya dengan 1 ketukan agar dapat dibuka langsung di Microsoft Excel atau Google Sheets.
+* 🗑️ **Swipe-to-Delete Riwayat Transaksi**: Hapus catatan harian dengan geser ke kiri (*swipe gesture*) dilengkapi dialog konfirmasi dan snackbar feedback tanpa perlu membuka form edit.
 * 💎 **Skala Eksekutif Triliun & Milyar**: Format nominal cerdas (`1.5jt`, `2.5M`, `10T`) dengan fitur *auto-fit scaling* pada kartu Net Worth agar angka tidak pernah terpotong atau overflow.
-* 📈 **Kurva Akumulasi Tabungan**: Grafik interaktif kurva tabungan (*Savings Growth Curve*) untuk memvisualisasikan percepatan pertumbuhan simpanan dari hari ke hari.
+* 📈 **Kurva Akumulasi Tabungan**: Grafik interaktif kurva tabungan (*Savings Growth Curve*) untuk memvisualisasikan percepatan pertumbuhan simpanan dari hari ke hari dengan penataan sumbu waktu yang rapi.
 * 🟣🟢🟡 **Trio Cincin Finansial Konsentris**: Visualisasi radar Apple Watch untuk memantau konsistensi streak harian, kendali pengeluaran vs budget, dan progres target tabungan.
-* 🔒 **Aegis Security Vault**: Kunci aplikasi dengan PIN 4-digit taktil, haptic feedback getar, dan auto-lock saat aplikasi diminimalkan.
+* 🔒 **Aegis Security Vault**: Kunci aplikasi dengan PIN 4-digit taktil simetris, haptic feedback getar, dan auto-lock saat aplikasi diminimalkan.
 * 👁️ **Sensor Privasi Cepat (1-Tap)**: Seketika menyamarkan seluruh nominal angka saldo menjadi `Rp ••••••••` saat berada di kafe atau tempat umum.
 * ⚡ **Pencatatan Kilat 3 Detik**: Numpad taktil dan chip angka instan (`+5k`, `+10k`, `+20k`, `+50k`, `+100k`) untuk mencatat transaksi harian tanpa buang waktu.
 * 📅 **Riwayat & Filter Fleksibel**: Filter cepat (*Semua, Pengeluaran, Pemasukan, Simpan*) dan rincian transaksi harian yang dapat dibuka/tutup (*expandable*).
 * 📲 **Pusat Cadangan & Pindah HP**: Cadangkan data dan pulihkan di perangkat baru semudah menyalin kode ke WhatsApp pribadi atau menyimpan file cadangan tanpa format rumit.
 * 🔔 **Pengingat Harian Otomatis**: Notifikasi harian lokal terjadwal agar pembukuan tidak pernah terlewat.
-* 🪶 **Ultra-Lightweight Size (~17 MB)**: Ukuran APK dipangkas lebih dari 65% melalui arsitektur kompilasi split ABI native.
+* 🪶 **Ultra-Lightweight Size (~21 MB)**: Ukuran APK dipangkas lebih dari 60% melalui arsitektur kompilasi split ABI native.
 
 ---
 
 <details>
-<summary>📐 <b>Detail Matematis & Automated Test Suite (29/29 Passed)</b></summary>
+<summary>📐 <b>Detail Matematis & Automated Test Suite (31/31 Passed)</b></summary>
 <br>
 
-Aegis Finance dibangun dengan invariant matematis ketat dan diuji dengan **29 unit test deterministik**:
+Aegis Finance dibangun dengan invariant matematis ketat dan diuji dengan **31 unit test deterministik**:
 
 | Metrik | Definisi | Rumus Invariant Matematis |
 |---|---|---|
 | **Sisa Kas (Cash)** | Kas cair operasional | $\text{Sisa}_t = \text{Sisa}_{t-1} + \text{In}_t - \text{Out}_t - \text{Save}_t + \Delta_{\text{transfer}}$ |
 | **Total Simpan** | Brankas tabungan | $\text{TotalSimpan}_t = \text{TotalSimpan}_{t-1} + \text{Save}_t + \Delta_{\text{transfer}}$ |
 | **Net Worth** | Total kekayaan bersih | $\text{NetWorth} = \text{Sisa} + \text{Total Simpan} + \sum \text{CustomAssets}$ |
+
+Untuk menjalankan test:
+```bash
+flutter test
+```
+</details>
 
 Untuk menjalankan test:
 ```bash
