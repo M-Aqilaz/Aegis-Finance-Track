@@ -15,7 +15,7 @@ class CurrencyFormatter {
     return _idrFormatter.format(amount);
   }
 
-  /// Format as 40k, 1.2jt, etc. or Rp 40k
+  /// Format as 40k, 1.2jt, 2.5M, 1.2T, etc. or Rp 40k
   static String formatShort(num amount, {bool withSymbol = true}) {
     if (amount == 0) {
       return withSymbol ? 'Rp 0' : '0';
@@ -24,7 +24,15 @@ class CurrencyFormatter {
     final absAmount = amount.abs();
     String formattedText;
 
-    if (absAmount >= 1000000) {
+    if (absAmount >= 1000000000000) {
+      final val = absAmount / 1000000000000;
+      final formatted = val % 1 == 0 ? val.toInt().toString() : val.toStringAsFixed(1);
+      formattedText = withSymbol ? 'Rp ${formatted}T' : '${formatted}T';
+    } else if (absAmount >= 1000000000) {
+      final val = absAmount / 1000000000;
+      final formatted = val % 1 == 0 ? val.toInt().toString() : val.toStringAsFixed(1);
+      formattedText = withSymbol ? 'Rp ${formatted}M' : '${formatted}M';
+    } else if (absAmount >= 1000000) {
       final val = absAmount / 1000000;
       final formatted = val % 1 == 0 ? val.toInt().toString() : val.toStringAsFixed(1);
       formattedText = withSymbol ? 'Rp ${formatted}jt' : '${formatted}jt';
@@ -39,7 +47,7 @@ class CurrencyFormatter {
     return isNegative ? '-$formattedText' : formattedText;
   }
 
-  /// Parse text input flexibly: "40k", "40K", "40.000", "40000", "1.5jt", "5k", "50 ribu", "Rp. 50k", etc.
+  /// Parse text input flexibly: "40k", "40K", "40.000", "40000", "1.5jt", "5k", "50 ribu", "2M", "1T", etc.
   static double parseAmount(String input) {
     if (input.trim().isEmpty) return 0.0;
     String clean = input.trim().toLowerCase();
@@ -54,26 +62,39 @@ class CurrencyFormatter {
     // Strip "rp.", "rp", "idr" and spaces
     clean = clean.replaceAll('idr', '').replaceAll('rp.', '').replaceAll('rp', '').replaceAll(' ', '');
 
-    // Handle "ribu", "rb", "k"
+    // Handle "triliun", "milyar", "miliar", "juta", "ribu", "jt", "rb", "t", "m", "k"
+    // Order matters: check longer multi-character suffixes before single-character suffixes!
     double multiplier = 1.0;
-    if (clean.endsWith('ribu')) {
-      clean = clean.substring(0, clean.length - 4);
-      multiplier = 1000.0;
-    } else if (clean.endsWith('rb')) {
-      clean = clean.substring(0, clean.length - 2);
-      multiplier = 1000.0;
-    } else if (clean.endsWith('k')) {
-      clean = clean.substring(0, clean.length - 1);
-      multiplier = 1000.0;
+    if (clean.endsWith('triliun')) {
+      clean = clean.substring(0, clean.length - 7);
+      multiplier = 1000000000000.0;
+    } else if (clean.endsWith('milyar')) {
+      clean = clean.substring(0, clean.length - 6);
+      multiplier = 1000000000.0;
+    } else if (clean.endsWith('miliar')) {
+      clean = clean.substring(0, clean.length - 6);
+      multiplier = 1000000000.0;
     } else if (clean.endsWith('juta')) {
       clean = clean.substring(0, clean.length - 4);
       multiplier = 1000000.0;
+    } else if (clean.endsWith('ribu')) {
+      clean = clean.substring(0, clean.length - 4);
+      multiplier = 1000.0;
     } else if (clean.endsWith('jt')) {
       clean = clean.substring(0, clean.length - 2);
       multiplier = 1000000.0;
+    } else if (clean.endsWith('rb')) {
+      clean = clean.substring(0, clean.length - 2);
+      multiplier = 1000.0;
+    } else if (clean.endsWith('t')) {
+      clean = clean.substring(0, clean.length - 1);
+      multiplier = 1000000000000.0;
     } else if (clean.endsWith('m') && !clean.contains('com')) {
       clean = clean.substring(0, clean.length - 1);
-      multiplier = 1000000.0;
+      multiplier = 1000000000.0;
+    } else if (clean.endsWith('k')) {
+      clean = clean.substring(0, clean.length - 1);
+      multiplier = 1000.0;
     }
 
     clean = clean.trim();

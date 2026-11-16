@@ -43,6 +43,7 @@ class StorageService extends ChangeNotifier {
   static const String _kPinEnabledKey = 'pref_pin_enabled';
   static const String _kPinCodeKey = 'pref_pin_code';
   static const String _kBiometricsEnabledKey = 'pref_biometrics_enabled';
+  static const String _kHasSeenOnboardingKey = 'pref_has_seen_onboarding';
 
   final List<DayEntry> _entries = [];
   final List<AssetAccount> _customAssets = [];
@@ -53,6 +54,7 @@ class StorageService extends ChangeNotifier {
   String _pinCode = '';
   bool _biometricsEnabled = true;
   bool _isAppLocked = false;
+  bool _hasSeenOnboarding = false;
 
   bool _reminderEnabled = true;
   int _reminderHour = 20; // 20:00 / 8 PM
@@ -76,6 +78,14 @@ class StorageService extends ChangeNotifier {
   int get reminderMinute => _reminderMinute;
   double get dailyExpenseLimit => _dailyExpenseLimit;
   String get themeMode => _themeMode;
+  bool get hasSeenOnboarding => _hasSeenOnboarding;
+
+  Future<void> completeOnboarding() async {
+    _hasSeenOnboarding = true;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_kHasSeenOnboardingKey, true);
+    notifyListeners();
+  }
 
   Future<void> togglePrivacyMode() async {
     _privacyMode = !_privacyMode;
@@ -239,6 +249,7 @@ class StorageService extends ChangeNotifier {
     _pinEnabled = prefs.getBool(_kPinEnabledKey) ?? false;
     _pinCode = prefs.getString(_kPinCodeKey) ?? '';
     _biometricsEnabled = prefs.getBool(_kBiometricsEnabledKey) ?? true;
+    _hasSeenOnboarding = prefs.getBool(_kHasSeenOnboardingKey) ?? false;
     if (_pinEnabled && _pinCode.isNotEmpty) {
       _isAppLocked = true;
     }

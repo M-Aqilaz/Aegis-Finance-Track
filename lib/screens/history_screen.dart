@@ -167,45 +167,6 @@ class _HistoryScreenState extends State<HistoryScreen> {
                 ),
               ),
 
-              // Quick Recap & Backup Action Pill
-              Padding(
-                padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
-                child: InkWell(
-                  onTap: () => HistoryRecapDialog.show(context, widget.storageService),
-                  borderRadius: BorderRadius.circular(12),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF6366F1).withValues(alpha: isDark ? 0.12 : 0.08),
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: const Color(0xFF6366F1).withValues(alpha: 0.25),
-                      ),
-                    ),
-                    child: const Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Row(
-                          children: [
-                            Icon(Icons.inventory_2_outlined, color: Color(0xFF6366F1), size: 18),
-                            SizedBox(width: 8),
-                            Text(
-                              'Rekap & Cadangan Data (Ekspor / Impor)',
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
-                                color: Color(0xFF6366F1),
-                              ),
-                            ),
-                          ],
-                        ),
-                        Icon(Icons.arrow_forward_ios, size: 12, color: Color(0xFF6366F1)),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-
               // Search & Filter Row
               Padding(
                 padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
@@ -241,7 +202,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                     const SizedBox(width: 8),
                     _buildFilterChip('income', 'Pemasukan ($incomeCount)'),
                     const SizedBox(width: 8),
-                    _buildFilterChip('save', 'Save ($saveCount)'),
+                    _buildFilterChip('save', 'Simpan ($saveCount)'),
                   ],
                 ),
               ),

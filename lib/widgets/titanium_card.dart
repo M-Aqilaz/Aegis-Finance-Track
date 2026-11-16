@@ -233,14 +233,21 @@ class TitaniumCard extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 4),
-                // Balance with High-Contrast Typography (or masked)
-                Text(
-                  privacyMode ? 'Rp ••••••••' : CurrencyFormatter.formatRp(totalAllAssets),
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 32,
-                    fontWeight: FontWeight.w900,
-                    letterSpacing: -0.5,
+                // Balance with High-Contrast Typography & Auto-Shrink for Milyar/Triliun
+                SizedBox(
+                  width: double.infinity,
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      privacyMode ? 'Rp ••••••••' : CurrencyFormatter.formatRp(totalAllAssets),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 32,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: -0.5,
+                      ),
+                    ),
                   ),
                 ),
 

@@ -4,6 +4,7 @@ import '../widgets/floating_island_nav_bar.dart';
 import 'asset_screen.dart';
 import 'history_screen.dart';
 import 'home_screen.dart';
+import 'onboarding_screen.dart';
 import 'pin_lock_screen.dart';
 import 'settings_screen.dart';
 
@@ -50,6 +51,11 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> with Widget
     return ListenableBuilder(
       listenable: widget.storageService,
       builder: (context, _) {
+        // Check onboarding first before lock or main screen
+        if (!widget.storageService.hasSeenOnboarding) {
+          return OnboardingScreen(storageService: widget.storageService);
+        }
+
         // If app is locked by Aegis Vault PIN, display Lock Screen immediately
         if (widget.storageService.pinEnabled && widget.storageService.isAppLocked) {
           return PinLockScreen(

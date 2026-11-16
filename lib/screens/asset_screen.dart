@@ -1,7 +1,7 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import '../models/pocket_transfer.dart';
-import '../models/transaction_entry.dart';
 import '../services/storage_service.dart';
 import '../utils/app_theme.dart';
 import '../utils/currency_formatter.dart';
@@ -48,17 +48,6 @@ class _AssetScreenState extends State<AssetScreen> {
         }
         final totalInPockets = slices.fold(0.0, (sum, item) => sum + item.amount);
 
-        // Daily average spending
-        final entries = s.entries;
-        double totalExpense = 0;
-        final List<ExpenseItem> allItems = [];
-        for (var e in entries) {
-          totalExpense += e.totalExpense;
-          allItems.addAll(e.expenses);
-        }
-        allItems.sort((a, b) => b.amount.compareTo(a.amount));
-        final avgExpense = entries.isNotEmpty ? totalExpense / entries.length : 0.0;
-
         return Scaffold(
           backgroundColor: AppTheme.obsidianBg,
           appBar: AppBar(
@@ -99,51 +88,6 @@ class _AssetScreenState extends State<AssetScreen> {
                     context,
                     storageService: s,
                     initialFromPocketId: StorageService.kPocketSavingsId,
-                  ),
-                ),
-
-                const SizedBox(height: 14),
-
-                // Pindah Dana Antar Kantong Quick Action Banner
-                InkWell(
-                  onTap: () => TransferDialog.show(
-                    context,
-                    storageService: s,
-                    initialFromPocketId: StorageService.kPocketSavingsId,
-                  ),
-                  borderRadius: BorderRadius.circular(16),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF6366F1).withValues(alpha: isDark ? 0.15 : 0.08),
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: const Color(0xFF6366F1).withValues(alpha: 0.3)),
-                    ),
-                    child: const Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Row(
-                          children: [
-                            Icon(Icons.swap_horiz_rounded, color: Color(0xFF6366F1), size: 22),
-                            SizedBox(width: 12),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Pindah Dana / Ambil Tabungan',
-                                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Color(0xFF6366F1)),
-                                ),
-                                Text(
-                                  'Tarik tabungan ke cash atau antar bank',
-                                  style: TextStyle(fontSize: 11, color: Colors.grey),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                        Icon(Icons.arrow_forward_ios_rounded, size: 14, color: Color(0xFF6366F1)),
-                      ],
-                    ),
                   ),
                 ),
 
@@ -335,105 +279,239 @@ class _AssetScreenState extends State<AssetScreen> {
                   const SizedBox(height: 20),
                 ],
 
-                // Summary Stats
-                const Text('Ringkasan Pengeluaran', style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
-                const SizedBox(height: 10),
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: AppTheme.glassCardDecoration(borderRadius: 18),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      Column(
-                        children: [
-                          Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const Icon(Icons.arrow_downward_rounded, size: 12, color: Color(0xFFEF4444)),
-                              const SizedBox(width: 4),
-                              Text('Total Keluar', style: TextStyle(fontSize: 11, color: isDark ? Colors.grey[400] : Colors.grey[600])),
-                            ],
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            CurrencyFormatter.formatShort(totalExpense),
-                            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFFEF4444)),
-                          ),
-                        ],
-                      ),
-                      Container(width: 1, height: 32, color: Colors.grey.withValues(alpha: 0.3)),
-                      Column(
-                        children: [
-                          Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const Icon(Icons.bar_chart_rounded, size: 12, color: Color(0xFF3B82F6)),
-                              const SizedBox(width: 4),
-                              Text('Rata-rata / Hari', style: TextStyle(fontSize: 11, color: isDark ? Colors.grey[400] : Colors.grey[600])),
-                            ],
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            CurrencyFormatter.formatShort(avgExpense),
-                            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF3B82F6)),
-                          ),
-                        ],
-                      ),
-                      Container(width: 1, height: 32, color: Colors.grey.withValues(alpha: 0.3)),
-                      Column(
-                        children: [
-                          Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const Icon(Icons.savings_rounded, size: 12, color: Color(0xFF06B6D4)),
-                              const SizedBox(width: 4),
-                              Text('Total Simpan', style: TextStyle(fontSize: 11, color: isDark ? Colors.grey[400] : Colors.grey[600])),
-                            ],
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            CurrencyFormatter.formatShort(s.currentTotalSimpan),
-                            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF06B6D4)),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-
-                if (allItems.isNotEmpty) ...[
-                  const SizedBox(height: 20),
-                  const Text('Item Terbesar', style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
-                  const SizedBox(height: 8),
-                  ...allItems.take(3).map((item) {
-                    return Container(
-                      margin: const EdgeInsets.only(bottom: 6),
-                      decoration: AppTheme.glassCardDecoration(borderRadius: 14),
-                      child: ListTile(
-                        dense: true,
-                        leading: Container(
-                          padding: const EdgeInsets.all(7),
-                          decoration: BoxDecoration(
-                            color: item.category.color.withValues(alpha: 0.15),
-                            shape: BoxShape.circle,
-                          ),
-                          child: Icon(item.category.icon, size: 16, color: item.category.color),
-                        ),
-                        title: Text(item.title, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
-                        trailing: Text(
-                          CurrencyFormatter.formatRp(item.amount),
-                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: item.category.color),
-                        ),
-                      ),
-                    );
-                  }),
-                ],
+                // Kurva Pertumbuhan Tabungan (Savings Growth Curve)
+                _buildSavingsGrowthChart(s, isDark),
                 const SizedBox(height: 30),
               ],
             ),
           ),
         );
       },
+    );
+  }
+
+  Widget _buildSavingsGrowthChart(StorageService s, bool isDark) {
+    final entries = s.entries;
+    final hasData = entries.isNotEmpty && s.savingsBalance > 0;
+
+    // Build data points
+    List<FlSpot> spots = [];
+    double maxVal = s.savingsBalance;
+
+    if (entries.isEmpty) {
+      spots = [const FlSpot(0, 0)];
+    } else {
+      for (int i = 0; i < entries.length; i++) {
+        final val = entries[i].runningTotalSimpan;
+        if (val > maxVal) maxVal = val;
+        spots.add(FlSpot(i.toDouble(), val));
+      }
+      if (spots.length == 1) {
+        spots.insert(0, const FlSpot(-1, 0));
+      }
+    }
+
+    final maxY = maxVal > 0 ? maxVal * 1.25 : 100000.0;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(6),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF06B6D4).withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Icon(Icons.trending_up_rounded, color: Color(0xFF06B6D4), size: 18),
+                ),
+                const SizedBox(width: 8),
+                const Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Kurva Pertumbuhan Tabungan',
+                      style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                    ),
+                    Text(
+                      'Akumulasi simpanan seiring waktu',
+                      style: TextStyle(fontSize: 11, color: Colors.grey),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+              decoration: BoxDecoration(
+                color: const Color(0xFF06B6D4).withValues(alpha: 0.15),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: const Color(0xFF06B6D4).withValues(alpha: 0.3)),
+              ),
+              child: Text(
+                CurrencyFormatter.formatShort(s.savingsBalance),
+                style: const TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF06B6D4),
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        Container(
+          height: 220,
+          padding: const EdgeInsets.fromLTRB(12, 16, 16, 10),
+          decoration: AppTheme.glassCardDecoration(borderRadius: 20),
+          child: !hasData
+              ? Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.savings_outlined, size: 36, color: Colors.grey.withValues(alpha: 0.5)),
+                      const SizedBox(height: 8),
+                      const Text(
+                        'Belum Ada Akumulasi Tabungan',
+                        style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13, color: Colors.grey),
+                      ),
+                      const SizedBox(height: 4),
+                      const Text(
+                        'Catat porsi simpanan atau pindahkan dana ke tabungan',
+                        style: TextStyle(fontSize: 11, color: Colors.grey),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  ),
+                )
+              : LineChart(
+                  LineChartData(
+                    gridData: FlGridData(
+                      show: true,
+                      drawVerticalLine: false,
+                      horizontalInterval: maxY / 4 > 0 ? maxY / 4 : 25000,
+                      getDrawingHorizontalLine: (value) => FlLine(
+                        color: Colors.white.withValues(alpha: 0.05),
+                        strokeWidth: 1,
+                      ),
+                    ),
+                    titlesData: FlTitlesData(
+                      show: true,
+                      rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                      topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                      bottomTitles: AxisTitles(
+                        sideTitles: SideTitles(
+                          showTitles: true,
+                          reservedSize: 22,
+                          interval: spots.length > 5 ? (spots.length / 3).floorToDouble() : 1,
+                          getTitlesWidget: (value, meta) {
+                            final idx = value.toInt();
+                            if (idx < 0 || idx >= entries.length) {
+                              return const SizedBox.shrink();
+                            }
+                            return Padding(
+                              padding: const EdgeInsets.only(top: 4),
+                              child: Text(
+                                DateFormat('d MMM').format(entries[idx].date),
+                                style: TextStyle(
+                                  color: Colors.grey[500],
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                      leftTitles: AxisTitles(
+                        sideTitles: SideTitles(
+                          showTitles: true,
+                          reservedSize: 46,
+                          interval: maxY / 4 > 0 ? maxY / 4 : 25000,
+                          getTitlesWidget: (value, meta) {
+                            if (value <= 0 || value >= maxY * 0.98) {
+                              return const SizedBox.shrink();
+                            }
+                            return Text(
+                              CurrencyFormatter.formatShort(value),
+                              style: TextStyle(
+                                color: Colors.grey[500],
+                                fontSize: 10,
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ),
+                    borderData: FlBorderData(show: false),
+                    minY: 0,
+                    maxY: maxY,
+                    lineBarsData: [
+                      LineChartBarData(
+                        spots: spots,
+                        isCurved: true,
+                        curveSmoothness: 0.35,
+                        gradient: const LinearGradient(
+                          colors: [Color(0xFF10B981), Color(0xFF06B6D4)],
+                        ),
+                        barWidth: 3,
+                        isStrokeCapRound: true,
+                        dotData: FlDotData(
+                          show: spots.length <= 10,
+                          getDotPainter: (spot, percent, barData, index) => FlDotCirclePainter(
+                            radius: 3,
+                            color: const Color(0xFF06B6D4),
+                            strokeWidth: 1.5,
+                            strokeColor: Colors.white,
+                          ),
+                        ),
+                        belowBarData: BarAreaData(
+                          show: true,
+                          gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [
+                              const Color(0xFF06B6D4).withValues(alpha: 0.28),
+                              const Color(0xFF06B6D4).withValues(alpha: 0.0),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                    lineTouchData: LineTouchData(
+                      handleBuiltInTouches: true,
+                      touchTooltipData: LineTouchTooltipData(
+                        getTooltipColor: (_) => const Color(0xFF1E293B),
+                        getTooltipItems: (touchedSpots) {
+                          return touchedSpots.map((spot) {
+                            final idx = spot.x.toInt().clamp(0, entries.length - 1);
+                            final entryDate = entries.isNotEmpty ? entries[idx].date : DateTime.now();
+                            return LineTooltipItem(
+                              '${DateFormat('dd MMM yyyy').format(entryDate)}\n',
+                              const TextStyle(color: Colors.white70, fontSize: 10),
+                              children: [
+                                TextSpan(
+                                  text: CurrencyFormatter.formatRp(spot.y),
+                                  style: const TextStyle(
+                                    color: Color(0xFF06B6D4),
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 13,
+                                  ),
+                                ),
+                              ],
+                            );
+                          }).toList();
+                        },
+                      ),
+                    ),
+                  ),
+                ),
+        ),
+      ],
     );
   }
 

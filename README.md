@@ -24,11 +24,17 @@
 Tidak perlu setup Flutter atau compile source code dari nol. Unduh APK resmi dan pasang langsung di HP Android Anda:
 
 <p align="center">
+  <a href="https://github.com/M-Aqilaz/Aegis-Finance-Track/releases/latest/download/AegisFinance-v1.1-arm64.apk">
+    <img src="https://img.shields.io/badge/Download_APK_Ringan-~17_MB_(ARM64)-00F59B?style=for-the-badge&logo=android&logoColor=0B0F17" alt="Download APK Ringan (ARM64)"/>
+  </a>
+  &nbsp;&nbsp;
   <a href="https://github.com/M-Aqilaz/Aegis-Finance-Track/releases/latest/download/AegisFinance-Universal.apk">
-    <img src="https://img.shields.io/badge/Download_APK-AegisFinance--Universal.apk-00F59B?style=for-the-badge&logo=android&logoColor=0B0F17" alt="Download APK Siap Pakai"/>
+    <img src="https://img.shields.io/badge/Download_APK-Universal_Compat-6366F1?style=for-the-badge&logo=android&logoColor=FFFFFF" alt="Download Universal APK"/>
   </a>
 </p>
 
+> **💡 Rekomendasi:** Unduh versi **ARM64 (~17 MB)** untuk HP Android modern (98%+ pengguna). Unduh versi **Universal** jika Anda menggunakan HP Android lama (32-bit).
+>
 > **Panduan Install 3 Langkah:**
 > 1. Klik tombol **Download APK** di atas (atau via [GitHub Releases](https://github.com/M-Aqilaz/Aegis-Finance-Track/releases/latest)).
 > 2. Buka file `.apk` yang telah diunduh di HP Anda, lalu pilih **Izinkan instalasi**.
@@ -57,14 +63,18 @@ Tidak perlu setup Flutter atau compile source code dari nol. Unduh APK resmi dan
 
 ## ✨ Fitur Unggulan
 
+* 🚀 **Obsidian Onboarding Experience**: Panduan pengenalan 3-slide visual kosmik yang mulus untuk pengguna baru saat pertama kali membuka aplikasi.
 * 💳 **Black Titanium Card & Multi-Pocket**: Pantau kekayaan riil (*Net Worth*), sisa kas harian, tabungan vault, dan rekening bank (SeaBank, Bank Jago, dll) lengkap dengan fitur transfer dana antar kantong.
+* 💎 **Skala Eksekutif Triliun & Milyar**: Format nominal cerdas (`1.5jt`, `2.5M`, `10T`) dengan fitur *auto-fit scaling* pada kartu Net Worth agar angka tidak pernah terpotong atau overflow.
+* 📈 **Kurva Akumulasi Tabungan**: Grafik interaktif kurva tabungan (*Savings Growth Curve*) untuk memvisualisasikan percepatan pertumbuhan simpanan dari hari ke hari.
 * 🟣🟢🟡 **Trio Cincin Finansial Konsentris**: Visualisasi radar Apple Watch untuk memantau konsistensi streak harian, kendali pengeluaran vs budget, dan progres target tabungan.
 * 🔒 **Aegis Security Vault**: Kunci aplikasi dengan PIN 4-digit taktil, haptic feedback getar, sensor biometrik (sidik jari/Face ID), dan auto-lock saat aplikasi diminimalkan.
 * 👁️ **Sensor Privasi Cepat (1-Tap)**: Seketika menyamarkan seluruh nominal angka saldo menjadi `Rp ••••••••` saat berada di kafe atau tempat umum.
 * ⚡ **Pencatatan Kilat 3 Detik**: Numpad taktil dan chip angka instan (`+5k`, `+10k`, `+20k`, `+50k`, `+100k`) untuk mencatat transaksi harian tanpa buang waktu.
 * 📅 **Riwayat & Filter Fleksibel**: Filter cepat (*Semua, Pengeluaran, Pemasukan, Simpan*) dan rincian transaksi harian yang dapat dibuka/tutup (*expandable*).
-* 📲 **Pindah HP Tanpa Ribet**: Cadangkan data dan pulihkan di perangkat baru semudah menyalin kode ke WhatsApp pribadi atau menyimpan file cadangan. Tanpa istilah JSON yang membingungkan.
+* 📲 **Pusat Cadangan & Pindah HP**: Cadangkan data dan pulihkan di perangkat baru semudah menyalin kode ke WhatsApp pribadi atau menyimpan file cadangan tanpa format rumit.
 * 🔔 **Pengingat Harian Otomatis**: Notifikasi harian lokal terjadwal agar pembukuan tidak pernah terlewat.
+* 🪶 **Ultra-Lightweight Size (~17 MB)**: Ukuran APK dipangkas lebih dari 65% melalui arsitektur kompilasi split ABI native.
 
 ---
 

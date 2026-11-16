@@ -37,7 +37,6 @@ class HomeScreen extends StatelessWidget {
         final todayEntry = storageService.getEntryByDate(now);
         final todayExpense = todayEntry?.totalExpense ?? 0.0;
         final dailyLimit = storageService.dailyExpenseLimit;
-        final expenseRatio = dailyLimit > 0 ? (todayExpense / dailyLimit).clamp(0.0, 1.0) : 0.0;
 
         return Scaffold(
           backgroundColor: AppTheme.obsidianBg,
@@ -398,78 +397,9 @@ class HomeScreen extends StatelessWidget {
                         onTap: () => QuickLogBottomSheet.show(context, storageService: storageService),
                       ),
 
-                      const SizedBox(height: 14),
+                      const SizedBox(height: 18),
 
-                      // 4. Daily Spending Health Radar / Gauge
-                      Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                        decoration: AppTheme.glassCardDecoration(borderRadius: 18),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Row(
-                                  children: [
-                                    Icon(
-                                      todayExpense >= dailyLimit
-                                          ? Icons.warning_amber_rounded
-                                          : (todayExpense > 0 ? Icons.bolt_rounded : Icons.shield_rounded),
-                                      size: 18,
-                                      color: todayExpense >= dailyLimit
-                                          ? AppTheme.neonCoral
-                                          : (todayExpense > 0 ? AppTheme.solarAmber : AppTheme.cyberMint),
-                                    ),
-                                    const SizedBox(width: 8),
-                                    const Text(
-                                      'Radar Pengeluaran Hari Ini',
-                                      style: TextStyle(
-                                        fontSize: 13,
-                                        fontWeight: FontWeight.w700,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                Text(
-                                  todayExpense == 0
-                                      ? 'Hemat Rp 0'
-                                      : (privacyMode
-                                          ? 'Rp ••• / Limit'
-                                          : '${CurrencyFormatter.formatShort(todayExpense)} / ${CurrencyFormatter.formatShort(dailyLimit)}'),
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w800,
-                                    color: todayExpense >= dailyLimit
-                                        ? AppTheme.neonCoral
-                                        : (todayExpense > 0 ? AppTheme.solarAmber : AppTheme.cyberMint),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 10),
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(6),
-                              child: LinearProgressIndicator(
-                                value: todayExpense == 0 ? 0.02 : expenseRatio,
-                                minHeight: 7,
-                                backgroundColor: Colors.white.withValues(alpha: 0.08),
-                                valueColor: AlwaysStoppedAnimation<Color>(
-                                  todayExpense >= dailyLimit
-                                      ? AppTheme.neonCoral
-                                      : (todayExpense > 0 ? AppTheme.solarAmber : AppTheme.cyberMint),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-
-                      const SizedBox(height: 14),
-
-                      // 5. Prominent Integrated Quick Log Action Button
+                      // 4. Prominent Integrated Quick Log Action Button
                       InkWell(
                         onTap: () => QuickLogBottomSheet.show(context, storageService: storageService),
                         borderRadius: BorderRadius.circular(16),
@@ -502,79 +432,17 @@ class HomeScreen extends StatelessWidget {
                               Text(
                                 'Catat Transaksi (3 Detik)',
                                 style: TextStyle(
-                                  fontSize: 14.5,
-                                  fontWeight: FontWeight.w900,
-                                  color: Colors.black87,
-                                  letterSpacing: 0.2,
-                                ),
+                                    fontSize: 14.5,
+                                    fontWeight: FontWeight.w900,
+                                    color: Colors.black87,
+                                    letterSpacing: 0.2,
+                                  ),
                               ),
                             ],
                           ),
                         ),
                       ),
 
-                      const SizedBox(height: 14),
-
-                      // 6. Executive Quick Navigation Cards (Analisis & Riwayat)
-                      Row(
-                        children: [
-                          Expanded(
-                            child: InkWell(
-                              onTap: () => onNavigateTab(1),
-                              borderRadius: BorderRadius.circular(16),
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
-                                decoration: AppTheme.glassCardDecoration(borderRadius: 16),
-                                child: const Row(
-                                  children: [
-                                    Icon(Icons.pie_chart_rounded, color: Color(0xFF818CF8), size: 18),
-                                    SizedBox(width: 8),
-                                    Expanded(
-                                      child: Text(
-                                        'Analisis Aset',
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.w700,
-                                          fontSize: 12.5,
-                                          color: Colors.white,
-                                        ),
-                                      ),
-                                    ),
-                                    Icon(Icons.chevron_right, size: 16, color: Colors.white38),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: InkWell(
-                              onTap: () => onNavigateTab(2),
-                              borderRadius: BorderRadius.circular(16),
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
-                                decoration: AppTheme.glassCardDecoration(borderRadius: 16),
-                                child: const Row(
-                                  children: [
-                                    Icon(Icons.receipt_long_rounded, color: AppTheme.cyberMint, size: 18),
-                                    SizedBox(width: 8),
-                                    Expanded(
-                                      child: Text(
-                                        'Riwayat Kas',
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.w700,
-                                          fontSize: 12.5,
-                                          color: Colors.white,
-                                        ),
-                                      ),
-                                    ),
-                                    Icon(Icons.chevron_right, size: 16, color: Colors.white38),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
                       const SizedBox(height: 90),
                     ],
                   ),
