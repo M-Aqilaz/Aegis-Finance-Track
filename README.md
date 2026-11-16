@@ -81,7 +81,7 @@ flowchart LR
     B <--> C["📊 Kantong Aset<br/>Donut & Kurva Tabungan"]
     B <--> D["📅 Riwayat Transaksi<br/>Filter & Expandable Cards"]
     B <--> E["⚙️ Pengaturan<br/>Pusat Cadangan & Vault"]
-    E -.-> F["🔒 Aegis Vault PIN<br/>(4-Digit & Biometric)"]
+    E -.-> F["🔒 Aegis Vault PIN<br/>(4-Digit Secure PIN)"]
 ```
 
 | Modul Visual | Peran & Pengalaman Pengguna |
@@ -91,7 +91,7 @@ flowchart LR
 | **📊 Kantong Aset & Analisis** | Visualisasi donat proporsi aset (Cash, Tabungan, SeaBank, Bank Jago, dompet custom), tombol transfer cepat antar-kantong, dan **Kurva Akumulasi Tabungan**. |
 | **📅 Riwayat Transaksi** | Catatan pembukuan per tanggal yang rapi, tombol filter chip (*Semua, Pengeluaran, Pemasukan, Simpan*), dan rincian transaksi harian yang dapat diperluas. |
 | **⚙️ Pengaturan & Pusat Cadangan** | Pengaturan pengingat harian jam 20:00 WIB, sensor privasi samaran, serta **Pusat Cadangan & Pindah HP** satu pintu (ekspor file atau salin kode via WhatsApp). |
-| **🔒 Aegis Security Vault** | Layar kunci PIN 4-digit taktil dengan dukungan sensor sidik jari/Face ID dan auto-lock seketika saat aplikasi diminimalkan. |
+| **🔒 Aegis Security Vault** | Layar kunci PIN 4-digit taktil dengan indikator dot dan auto-lock seketika saat aplikasi diminimalkan. |
 
 ---
 
@@ -102,7 +102,7 @@ flowchart LR
 * 💎 **Skala Eksekutif Triliun & Milyar**: Format nominal cerdas (`1.5jt`, `2.5M`, `10T`) dengan fitur *auto-fit scaling* pada kartu Net Worth agar angka tidak pernah terpotong atau overflow.
 * 📈 **Kurva Akumulasi Tabungan**: Grafik interaktif kurva tabungan (*Savings Growth Curve*) untuk memvisualisasikan percepatan pertumbuhan simpanan dari hari ke hari.
 * 🟣🟢🟡 **Trio Cincin Finansial Konsentris**: Visualisasi radar Apple Watch untuk memantau konsistensi streak harian, kendali pengeluaran vs budget, dan progres target tabungan.
-* 🔒 **Aegis Security Vault**: Kunci aplikasi dengan PIN 4-digit taktil, haptic feedback getar, sensor biometrik (sidik jari/Face ID), dan auto-lock saat aplikasi diminimalkan.
+* 🔒 **Aegis Security Vault**: Kunci aplikasi dengan PIN 4-digit taktil, haptic feedback getar, dan auto-lock saat aplikasi diminimalkan.
 * 👁️ **Sensor Privasi Cepat (1-Tap)**: Seketika menyamarkan seluruh nominal angka saldo menjadi `Rp ••••••••` saat berada di kafe atau tempat umum.
 * ⚡ **Pencatatan Kilat 3 Detik**: Numpad taktil dan chip angka instan (`+5k`, `+10k`, `+20k`, `+50k`, `+100k`) untuk mencatat transaksi harian tanpa buang waktu.
 * 📅 **Riwayat & Filter Fleksibel**: Filter cepat (*Semua, Pengeluaran, Pemasukan, Simpan*) dan rincian transaksi harian yang dapat dibuka/tutup (*expandable*).

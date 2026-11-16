@@ -190,17 +190,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     trailing: const Icon(Icons.arrow_forward_ios, size: 14),
                     onTap: _openPinChange,
                   ),
-                  const Divider(height: 1),
-                  SwitchListTile(
-                    secondary: const Icon(Icons.fingerprint_rounded, color: AppTheme.electricCyan),
-                    title: const Text('Buka Cepat dengan Biometrik', style: TextStyle(fontWeight: FontWeight.w600)),
-                    value: s.biometricsEnabled,
-                    activeThumbColor: AppTheme.electricCyan,
-                    onChanged: (val) async {
-                      await s.toggleBiometrics(val);
-                      setState(() {});
-                    },
-                  ),
                 ],
               ],
             ),

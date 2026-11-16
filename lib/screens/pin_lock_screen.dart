@@ -162,17 +162,6 @@ class _PinLockScreenState extends State<PinLockScreen> with SingleTickerProvider
     _shakeController.forward(from: 0.0);
   }
 
-  void _onBiometricTap() {
-    if (!widget.storageService.biometricsEnabled) return;
-    HapticFeedback.mediumImpact();
-    // Smooth biometric authentication shortcut
-    widget.storageService.unlockApp();
-    widget.onSuccess?.call();
-    if (widget.mode != PinLockMode.unlock && mounted) {
-      Navigator.of(context).maybePop();
-    }
-  }
-
   String _getTitle() {
     switch (widget.mode) {
       case PinLockMode.unlock:
@@ -376,15 +365,8 @@ class _PinLockScreenState extends State<PinLockScreen> with SingleTickerProvider
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      // Left Action: Biometrics or Empty
-                      if (widget.mode == PinLockMode.unlock && widget.storageService.biometricsEnabled)
-                        _buildActionKey(
-                          icon: Icons.fingerprint_rounded,
-                          label: 'BIOMETRIK',
-                          onTap: _onBiometricTap,
-                        )
-                      else
-                        const SizedBox(width: 72, height: 72),
+                      // Empty placeholder on left to balance the zero key in center
+                      const SizedBox(width: 72, height: 72),
 
                       // Zero
                       _buildNumKey('0', '+'),
