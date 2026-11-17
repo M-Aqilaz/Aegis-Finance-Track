@@ -330,7 +330,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           const SizedBox(height: 40),
           Center(
             child: Text(
-              'Financial Track v1.0',
+              'Aegis Finance v1.1',
               textAlign: TextAlign.center,
               style: TextStyle(fontSize: 12, color: isDark ? Colors.grey[600] : Colors.grey[400]),
             ),

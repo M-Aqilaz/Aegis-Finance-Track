@@ -19,7 +19,7 @@ class HistoryScreen extends StatefulWidget {
 class _HistoryScreenState extends State<HistoryScreen> {
   String _searchQuery = '';
   String _filterType = 'all'; // all, expense, income, save
-  DateTime _selectedMonth = DateTime(2026, 11);
+  DateTime _selectedMonth = DateTime(DateTime.now().year, DateTime.now().month);
 
   @override
   Widget build(BuildContext context) {

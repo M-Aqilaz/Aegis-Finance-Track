@@ -246,7 +246,7 @@ class HomeScreen extends StatelessWidget {
                           children: [
                             // Cash Card
                             SizedBox(
-                              width: 132,
+                              width: 148,
                               child: _buildDebitCard(
                                 title: 'Cash Stash',
                                 subtitle: 'LIQUID CASH',
@@ -266,7 +266,7 @@ class HomeScreen extends StatelessWidget {
 
                             // Tabungan Vault Card
                             SizedBox(
-                              width: 132,
+                              width: 148,
                               child: _buildDebitCard(
                                 title: 'Tabungan',
                                 subtitle: 'HIGH-YIELD VAULT',
@@ -307,7 +307,7 @@ class HomeScreen extends StatelessWidget {
                               return Padding(
                                 padding: const EdgeInsets.only(right: 10),
                                 child: SizedBox(
-                                  width: 132,
+                                  width: 148,
                                   child: _buildDebitCard(
                                     title: asset.name,
                                     subtitle: sub,
@@ -525,6 +525,8 @@ class HomeScreen extends StatelessWidget {
                   children: [
                     Text(
                       subtitle,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         fontSize: 8,
                         fontWeight: FontWeight.w900,

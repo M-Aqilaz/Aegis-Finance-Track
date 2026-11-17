@@ -49,9 +49,9 @@ class _AssetScreenState extends State<AssetScreen> {
         final totalInPockets = slices.fold(0.0, (sum, item) => sum + item.amount);
 
         return Scaffold(
-          backgroundColor: AppTheme.obsidianBg,
+          backgroundColor: isDark ? AppTheme.obsidianBg : Theme.of(context).scaffoldBackgroundColor,
           appBar: AppBar(
-            backgroundColor: AppTheme.obsidianBg,
+            backgroundColor: isDark ? AppTheme.obsidianBg : Theme.of(context).scaffoldBackgroundColor,
             elevation: 0,
             title: const Text('Kantong Aset & Analisis', style: TextStyle(fontWeight: FontWeight.bold)),
             actions: [
@@ -407,18 +407,25 @@ class _AssetScreenState extends State<AssetScreen> {
                         sideTitles: SideTitles(
                           showTitles: true,
                           reservedSize: 28,
-                          interval: spots.length > 6
-                              ? (spots.length / 4).ceilToDouble()
-                              : spots.length > 3
-                                  ? 2
-                                  : 1,
+                          interval: spots.length > 12
+                              ? (spots.length / 3).ceilToDouble()
+                              : spots.length > 6
+                                  ? (spots.length / 3).ceilToDouble()
+                                  : spots.length > 3
+                                      ? 2
+                                      : 1,
                           getTitlesWidget: (value, meta) {
                             final idx = value.toInt();
-                            // Skip first and last to prevent edge clipping
+                            // Skip out-of-range and edge labels to prevent clipping
                             if (idx < 0 ||
                                 idx >= entries.length ||
                                 value == meta.min ||
                                 value == meta.max) {
+                              return const SizedBox.shrink();
+                            }
+                            // Also skip labels too close to edges (within 1 step)
+                            if ((value - meta.min).abs() < 1.5 ||
+                                (meta.max - value).abs() < 1.5) {
                               return const SizedBox.shrink();
                             }
                             return SideTitleWidget(
@@ -426,7 +433,7 @@ class _AssetScreenState extends State<AssetScreen> {
                               fitInside: SideTitleFitInsideData.fromTitleMeta(
                                 meta,
                                 enabled: true,
-                                distanceFromEdge: 2,
+                                distanceFromEdge: 4,
                               ),
                               child: Text(
                                 DateFormat('d MMM').format(entries[idx].date),
