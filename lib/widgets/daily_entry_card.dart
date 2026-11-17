@@ -8,6 +8,7 @@ class DailyEntryCard extends StatefulWidget {
   final VoidCallback onEdit;
   final VoidCallback onDelete;
   final String activeFilter; // 'all', 'expense', 'income', 'save'
+  final bool privacyMode;
 
   const DailyEntryCard({
     super.key,
@@ -15,6 +16,7 @@ class DailyEntryCard extends StatefulWidget {
     required this.onEdit,
     required this.onDelete,
     this.activeFilter = 'all',
+    this.privacyMode = false,
   });
 
   @override
@@ -44,6 +46,7 @@ class _DailyEntryCardState extends State<DailyEntryCard> {
 
   // --- 1. FILTER: EXPENSE SPECIFIC CARD ---
   Widget _buildExpenseSpecificCard(DayEntry entry) {
+    final p = widget.privacyMode;
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
       decoration: BoxDecoration(
@@ -59,7 +62,11 @@ class _DailyEntryCardState extends State<DailyEntryCard> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildHeader(entry, pillColor: AppTheme.neonCoral, pillText: '-${CurrencyFormatter.formatRp(entry.totalExpense)}'),
+          _buildHeader(
+            entry,
+            pillColor: AppTheme.neonCoral,
+            pillText: p ? '-Rp •••' : '-${CurrencyFormatter.formatRp(entry.totalExpense)}',
+          ),
           const Divider(height: 1, thickness: 0.8, color: AppTheme.borderLight),
           Padding(
             padding: const EdgeInsets.all(14),
@@ -128,7 +135,7 @@ class _DailyEntryCardState extends State<DailyEntryCard> {
                               ),
                             ),
                             Text(
-                              '-${CurrencyFormatter.formatRp(item.amount)}',
+                              p ? '-Rp •••' : '-${CurrencyFormatter.formatRp(item.amount)}',
                               style: TextStyle(
                                 fontSize: 13,
                                 fontWeight: FontWeight.bold,
@@ -144,9 +151,9 @@ class _DailyEntryCardState extends State<DailyEntryCard> {
           ),
           _buildFooterRow(
             leftLabel: 'Sisa Kas Berjalan',
-            leftValue: CurrencyFormatter.formatRp(entry.runningSisa),
+            leftValue: p ? 'Rp •••' : CurrencyFormatter.formatRp(entry.runningSisa),
             rightLabel: 'Total Pengeluaran',
-            rightValue: CurrencyFormatter.formatRp(entry.totalExpense),
+            rightValue: p ? 'Rp •••' : CurrencyFormatter.formatRp(entry.totalExpense),
             rightColor: AppTheme.neonCoral,
           ),
         ],
@@ -156,6 +163,7 @@ class _DailyEntryCardState extends State<DailyEntryCard> {
 
   // --- 2. FILTER: INCOME SPECIFIC CARD ---
   Widget _buildIncomeSpecificCard(DayEntry entry) {
+    final p = widget.privacyMode;
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
       decoration: BoxDecoration(
@@ -171,7 +179,11 @@ class _DailyEntryCardState extends State<DailyEntryCard> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildHeader(entry, pillColor: AppTheme.cyberMint, pillText: '+${CurrencyFormatter.formatRp(entry.income)}'),
+          _buildHeader(
+            entry,
+            pillColor: AppTheme.cyberMint,
+            pillText: p ? '+Rp •••' : '+${CurrencyFormatter.formatRp(entry.income)}',
+          ),
           const Divider(height: 1, thickness: 0.8, color: AppTheme.borderLight),
           Padding(
             padding: const EdgeInsets.all(14),
@@ -196,7 +208,7 @@ class _DailyEntryCardState extends State<DailyEntryCard> {
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        '+${CurrencyFormatter.formatRp(entry.income)}',
+                        p ? '+Rp •••' : '+${CurrencyFormatter.formatRp(entry.income)}',
                         style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w800,
@@ -218,9 +230,9 @@ class _DailyEntryCardState extends State<DailyEntryCard> {
           ),
           _buildFooterRow(
             leftLabel: 'Sisa Kas Berjalan',
-            leftValue: CurrencyFormatter.formatRp(entry.runningSisa),
+            leftValue: p ? 'Rp •••' : CurrencyFormatter.formatRp(entry.runningSisa),
             rightLabel: 'Pemasukan Hari Ini',
-            rightValue: CurrencyFormatter.formatRp(entry.income),
+            rightValue: p ? 'Rp •••' : CurrencyFormatter.formatRp(entry.income),
             rightColor: AppTheme.cyberMint,
           ),
         ],
@@ -230,6 +242,7 @@ class _DailyEntryCardState extends State<DailyEntryCard> {
 
   // --- 3. FILTER: SAVE SPECIFIC CARD ---
   Widget _buildSaveSpecificCard(DayEntry entry) {
+    final p = widget.privacyMode;
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
       decoration: BoxDecoration(
@@ -245,7 +258,11 @@ class _DailyEntryCardState extends State<DailyEntryCard> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildHeader(entry, pillColor: AppTheme.electricCyan, pillText: '+${CurrencyFormatter.formatRp(entry.saveAmount)} Simpan'),
+          _buildHeader(
+            entry,
+            pillColor: AppTheme.electricCyan,
+            pillText: p ? 'Rp ••• Simpan' : '+${CurrencyFormatter.formatRp(entry.saveAmount)} Simpan',
+          ),
           const Divider(height: 1, thickness: 0.8, color: AppTheme.borderLight),
           Padding(
             padding: const EdgeInsets.all(14),
@@ -270,7 +287,7 @@ class _DailyEntryCardState extends State<DailyEntryCard> {
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        '+${CurrencyFormatter.formatRp(entry.saveAmount)}',
+                        p ? '+Rp •••' : '+${CurrencyFormatter.formatRp(entry.saveAmount)}',
                         style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w800,
@@ -292,9 +309,9 @@ class _DailyEntryCardState extends State<DailyEntryCard> {
           ),
           _buildFooterRow(
             leftLabel: 'Total Tabungan Akumulatif',
-            leftValue: CurrencyFormatter.formatRp(entry.runningTotalSimpan),
+            leftValue: p ? 'Rp •••' : CurrencyFormatter.formatRp(entry.runningTotalSimpan),
             rightLabel: 'Simpan Hari Ini',
-            rightValue: CurrencyFormatter.formatRp(entry.saveAmount),
+            rightValue: p ? 'Rp •••' : CurrencyFormatter.formatRp(entry.saveAmount),
             rightColor: AppTheme.electricCyan,
           ),
         ],
@@ -401,7 +418,7 @@ class _DailyEntryCardState extends State<DailyEntryCard> {
                 Expanded(
                   child: _buildSubtleMetric(
                     label: 'Masuk',
-                    value: CurrencyFormatter.formatShort(entry.income),
+                    value: widget.privacyMode ? 'Rp •••' : CurrencyFormatter.formatShort(entry.income),
                     color: AppTheme.cyberMint,
                     icon: Icons.arrow_upward_rounded,
                   ),
@@ -410,7 +427,7 @@ class _DailyEntryCardState extends State<DailyEntryCard> {
                 Expanded(
                   child: _buildSubtleMetric(
                     label: 'Keluar',
-                    value: CurrencyFormatter.formatShort(entry.totalExpense),
+                    value: widget.privacyMode ? 'Rp •••' : CurrencyFormatter.formatShort(entry.totalExpense),
                     color: entry.totalExpense > 0 ? AppTheme.neonCoral : Colors.white38,
                     icon: Icons.arrow_downward_rounded,
                   ),
@@ -419,7 +436,7 @@ class _DailyEntryCardState extends State<DailyEntryCard> {
                 Expanded(
                   child: _buildSubtleMetric(
                     label: 'Save',
-                    value: CurrencyFormatter.formatShort(entry.saveAmount),
+                    value: widget.privacyMode ? 'Rp •••' : CurrencyFormatter.formatShort(entry.saveAmount),
                     color: AppTheme.electricCyan,
                     icon: Icons.savings_rounded,
                   ),
@@ -446,12 +463,17 @@ class _DailyEntryCardState extends State<DailyEntryCard> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      'Sisa Kas: ${CurrencyFormatter.formatShort(entry.runningSisa)}',
-                      style: const TextStyle(fontSize: 11.5, color: Colors.white70),
+                    Expanded(
+                      child: Text(
+                        'Sisa Kas: ${widget.privacyMode ? 'Rp •••' : CurrencyFormatter.formatShort(entry.runningSisa)}',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(fontSize: 11.5, color: Colors.white70),
+                      ),
                     ),
+                    const SizedBox(width: 8),
                     Text(
-                      'Total Simpan: ${CurrencyFormatter.formatShort(entry.runningTotalSimpan)}',
+                      'Total Simpan: ${widget.privacyMode ? 'Rp •••' : CurrencyFormatter.formatShort(entry.runningTotalSimpan)}',
                       style: const TextStyle(
                         fontSize: 11.5,
                         fontWeight: FontWeight.bold,
@@ -499,7 +521,7 @@ class _DailyEntryCardState extends State<DailyEntryCard> {
                                 ),
                               ),
                               Text(
-                                '-${CurrencyFormatter.formatRp(item.amount)}',
+                                widget.privacyMode ? '-Rp •••' : '-${CurrencyFormatter.formatRp(item.amount)}',
                                 style: TextStyle(
                                   fontSize: 11.5,
                                   fontWeight: FontWeight.bold,
@@ -522,48 +544,61 @@ class _DailyEntryCardState extends State<DailyEntryCard> {
   // --- REUSABLE HELPER COMPONENTS ---
   Widget _buildHeader(DayEntry entry, {required Color pillColor, required String pillText}) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(14, 10, 8, 8),
+      padding: const EdgeInsets.fromLTRB(14, 8, 8, 8),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Row(
-            children: [
-              Text(
-                CurrencyFormatter.formatDate(entry.date),
-                style: const TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w800,
-                  color: Colors.white,
-                ),
-              ),
-              const SizedBox(width: 8),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
-                decoration: BoxDecoration(
-                  color: pillColor.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(6),
-                ),
-                child: Text(
-                  pillText,
-                  style: TextStyle(
-                    fontSize: 10,
-                    fontWeight: FontWeight.bold,
-                    color: pillColor,
+          Expanded(
+            child: Row(
+              children: [
+                Flexible(
+                  child: Text(
+                    CurrencyFormatter.formatDate(entry.date),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w800,
+                      color: Colors.white,
+                    ),
                   ),
                 ),
-              ),
-            ],
+                const SizedBox(width: 8),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: pillColor.withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: Text(
+                    pillText,
+                    style: TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                      color: pillColor,
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
           Row(
+            mainAxisSize: MainAxisSize.min,
             children: [
               IconButton(
-                icon: const Icon(Icons.edit_outlined, size: 18),
+                visualDensity: VisualDensity.compact,
+                padding: const EdgeInsets.all(6),
+                constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+                icon: const Icon(Icons.edit_outlined, size: 17),
                 color: Colors.grey[400],
                 onPressed: widget.onEdit,
                 tooltip: 'Edit Catatan',
               ),
               IconButton(
-                icon: const Icon(Icons.delete_outline, size: 18),
+                visualDensity: VisualDensity.compact,
+                padding: const EdgeInsets.all(6),
+                constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+                icon: const Icon(Icons.delete_outline, size: 17),
                 color: AppTheme.neonCoral.withValues(alpha: 0.8),
                 onPressed: widget.onDelete,
                 tooltip: 'Hapus Catatan',
@@ -597,10 +632,15 @@ class _DailyEntryCardState extends State<DailyEntryCard> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            '$leftLabel: $leftValue',
-            style: const TextStyle(fontSize: 11, color: Colors.white60),
+          Expanded(
+            child: Text(
+              '$leftLabel: $leftValue',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(fontSize: 11, color: Colors.white60),
+            ),
           ),
+          const SizedBox(width: 8),
           Text(
             rightValue,
             style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: rightColor),

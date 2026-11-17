@@ -42,7 +42,7 @@ class HomeScreen extends StatelessWidget {
         final dailyLimit = storageService.dailyExpenseLimit;
         final isDark = Theme.of(context).brightness == Brightness.dark;
 
-        // Freedom Runway & Safe Daily Spend
+        // Freedom Runway (Total Liquid Assets / Daily Burn Rate) & Safe Daily Spend
         double totalRecentExpense = 0.0;
         final recentEntries = storageService.entries.take(7).toList();
         for (final e in recentEntries) {
@@ -51,8 +51,8 @@ class HomeScreen extends StatelessWidget {
         final avgDailyBurn = recentEntries.isNotEmpty
             ? (totalRecentExpense / recentEntries.length)
             : 25000.0;
-        final runwayDays = cashBalance > 0 && avgDailyBurn > 0
-            ? (cashBalance / avgDailyBurn)
+        final runwayDays = totalAllAssets > 0 && avgDailyBurn > 0
+            ? (totalAllAssets / avgDailyBurn)
             : 0.0;
         final lastDayOfMonth = DateTime(now.year, now.month + 1, 0).day;
         final daysRemaining = (lastDayOfMonth - now.day).clamp(1, 31);
@@ -72,23 +72,32 @@ class HomeScreen extends StatelessWidget {
                 toolbarHeight: 70,
                 title: Row(
                   children: [
-                    // Clean Vault Shield Logomark
+                    // The Aegis Vault Prism Logomark
                     Container(
                       width: 36,
                       height: 36,
                       decoration: BoxDecoration(
-                        color: AppTheme.surfaceCardElevated,
-                        shape: BoxShape.circle,
+                        borderRadius: BorderRadius.circular(10),
                         border: Border.all(
-                          color: AppTheme.cyberMint.withValues(alpha: 0.3),
+                          color: AppTheme.cyberMint.withValues(alpha: 0.4),
                           width: 1,
                         ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppTheme.cyberMint.withValues(alpha: 0.15),
+                            blurRadius: 8,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
                       ),
-                      child: const Center(
-                        child: Icon(
-                          Icons.shield_outlined,
-                          size: 18,
-                          color: AppTheme.cyberMint,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(9),
+                        child: Image.asset(
+                          'assets/icon/app_icon.png',
+                          fit: BoxFit.cover,
+                          errorBuilder: (ctx, _, __) => const Center(
+                            child: Icon(Icons.shield_rounded, size: 18, color: AppTheme.cyberMint),
+                          ),
                         ),
                       ),
                     ),
@@ -441,22 +450,54 @@ class HomeScreen extends StatelessWidget {
 
                       const SizedBox(height: 22),
 
-                      // 5. Leak Analysis (expense pattern detector)
+                      // 5. Executive Financial Health Summary (Clean & Ergonomic)
                       if (storageService.entries.isNotEmpty) ...[
-                        const Align(
-                          alignment: Alignment.centerLeft,
-                          child: Text(
-                            'ANALISIS KEUANGAN',
-                            style: TextStyle(
-                              fontSize: 11,
-                              fontWeight: FontWeight.w800,
-                              letterSpacing: 1.2,
-                              color: Colors.white54,
+                        InkWell(
+                          onTap: () => onNavigateTab(1),
+                          borderRadius: BorderRadius.circular(16),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                            decoration: AppTheme.glassCardDecoration(borderRadius: 16),
+                            child: Row(
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(8),
+                                  decoration: BoxDecoration(
+                                    color: AppTheme.cyberMint.withValues(alpha: 0.12),
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: const Icon(Icons.insights_rounded, size: 18, color: AppTheme.cyberMint),
+                                ),
+                                const SizedBox(width: 12),
+                                const Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'STATUS KESEHATAN ARUS KAS',
+                                        style: TextStyle(
+                                          fontSize: 10.5,
+                                          fontWeight: FontWeight.w800,
+                                          color: Colors.white54,
+                                          letterSpacing: 0.8,
+                                        ),
+                                      ),
+                                      SizedBox(height: 2),
+                                      Text(
+                                        'Pola pengeluaran terkendali • Ketuk untuk analisis lengkap',
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Colors.white),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                const Icon(Icons.arrow_forward_ios_rounded, size: 13, color: Colors.white38),
+                              ],
                             ),
                           ),
                         ),
-                        const SizedBox(height: 10),
-                        LeakAnalysisCard(entries: storageService.entries.toList()),
                         const SizedBox(height: 18),
                       ],
 
@@ -510,15 +551,19 @@ class HomeScreen extends StatelessWidget {
                   ),
                   child: Icon(icon, size: 14, color: Colors.white),
                 ),
-                Text(
-                  subtitle,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontSize: 8.5,
-                    fontWeight: FontWeight.w800,
-                    color: Colors.white54,
-                    letterSpacing: 0.6,
+                const SizedBox(width: 4),
+                Expanded(
+                  child: Text(
+                    subtitle,
+                    textAlign: TextAlign.right,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 8.5,
+                      fontWeight: FontWeight.w800,
+                      color: Colors.white54,
+                      letterSpacing: 0.6,
+                    ),
                   ),
                 ),
               ],

@@ -90,6 +90,14 @@ class _HistoryScreenState extends State<HistoryScreen> {
             ),
             actions: [
               IconButton(
+                icon: Icon(
+                  widget.storageService.privacyMode ? Icons.visibility_off_rounded : Icons.visibility_rounded,
+                  color: widget.storageService.privacyMode ? AppTheme.solarAmber : Colors.white70,
+                ),
+                tooltip: widget.storageService.privacyMode ? 'Tampilkan Saldo' : 'Sembunyikan Saldo (Privasi)',
+                onPressed: widget.storageService.togglePrivacyMode,
+              ),
+              IconButton(
                 icon: const Icon(Icons.backup_table_rounded, color: AppTheme.cyberMint),
                 tooltip: 'Rekap & Cadangan',
                 onPressed: () => HistoryRecapDialog.show(context, widget.storageService),
@@ -280,6 +288,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                             child: DailyEntryCard(
                               entry: entry,
                               activeFilter: _filterType,
+                              privacyMode: widget.storageService.privacyMode,
                               onEdit: () {
                                 Navigator.push(
                                   context,
@@ -310,7 +319,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
         Text(label, style: const TextStyle(fontSize: 11, color: Colors.grey)),
         const SizedBox(height: 2),
         Text(
-          CurrencyFormatter.formatShort(amount),
+          widget.storageService.privacyMode ? 'Rp •••' : CurrencyFormatter.formatShort(amount),
           style: TextStyle(
             fontSize: 13,
             fontWeight: FontWeight.bold,

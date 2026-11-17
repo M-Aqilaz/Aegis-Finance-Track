@@ -46,21 +46,28 @@ class FinancialRingsCard extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Row(
-                  children: [
-                    Icon(Icons.donut_large_rounded, size: 16, color: AppTheme.cyberMint),
-                    SizedBox(width: 8),
-                    Text(
-                      'CINCIN FINANSIAL HARIAN',
-                      style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: 1.1,
-                        color: Colors.white70,
+                const Expanded(
+                  child: Row(
+                    children: [
+                      Icon(Icons.donut_large_rounded, size: 16, color: AppTheme.cyberMint),
+                      SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          'CINCIN FINANSIAL HARIAN',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: 1.1,
+                            color: Colors.white70,
+                          ),
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
+                const SizedBox(width: 8),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                   decoration: BoxDecoration(
@@ -188,17 +195,31 @@ class FinancialRingsCard extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 8),
-        Text(
-          title,
-          style: const TextStyle(fontSize: 11, color: Colors.white60, fontWeight: FontWeight.w600),
+        Expanded(
+          flex: 4,
+          child: Text(
+            title,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(fontSize: 11, color: Colors.white60, fontWeight: FontWeight.w600),
+          ),
         ),
-        const Spacer(),
-        Text(
-          status,
-          style: TextStyle(
-            fontSize: 11,
-            fontWeight: FontWeight.w800,
-            color: highlight ? Colors.white : Colors.white38,
+        const SizedBox(width: 4),
+        Expanded(
+          flex: 5,
+          child: Align(
+            alignment: Alignment.centerRight,
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Text(
+                status,
+                style: TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w800,
+                  color: highlight ? Colors.white : Colors.white38,
+                ),
+              ),
+            ),
           ),
         ),
       ],

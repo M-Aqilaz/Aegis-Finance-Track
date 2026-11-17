@@ -149,6 +149,24 @@ class _SmartCommandBarState extends State<SmartCommandBar> {
         ? const Color(0xFFF87171)
         : (parsed.type == ParsedType.income ? AppTheme.cyberMint : AppTheme.solarAmber);
 
+    String contextualNote = '${parsed.category.displayName} • ${parsed.pocketName}';
+    if (parsed.type == ParsedType.expense) {
+      final dailyLimit = widget.storageService.dailyExpenseLimit;
+      final todayExpense = (existing?.totalExpense ?? 0.0) + parsed.amount;
+      if (dailyLimit > 0) {
+        final remaining = dailyLimit - todayExpense;
+        if (remaining > 0) {
+          contextualNote = '${parsed.category.displayName} • Sisa limit hari ini: ${CurrencyFormatter.formatShort(remaining)}';
+        } else {
+          contextualNote = '${parsed.category.displayName} • ⚠️ Limit harian terlampaui';
+        }
+      }
+    } else if (parsed.type == ParsedType.income) {
+      contextualNote = 'Pemasukan ke ${parsed.pocketName} • Saldo bertambah';
+    } else if (parsed.type == ParsedType.save) {
+      contextualNote = 'Disimpan ke Vault Tabungan • Akumulasi aman';
+    }
+
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         backgroundColor: const Color(0xFF111726),
@@ -186,7 +204,9 @@ class _SmartCommandBarState extends State<SmartCommandBar> {
                     ),
                   ),
                   Text(
-                    '${parsed.category.displayName} • ${parsed.pocketName}',
+                    contextualNote,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: const TextStyle(color: Colors.white54, fontSize: 10.5),
                   ),
                 ],

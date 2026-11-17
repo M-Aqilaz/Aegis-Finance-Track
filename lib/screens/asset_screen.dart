@@ -6,6 +6,7 @@ import '../services/storage_service.dart';
 import '../utils/app_theme.dart';
 import '../utils/currency_formatter.dart';
 import '../widgets/asset_dialogs.dart';
+import '../widgets/leak_analysis_card.dart';
 import '../widgets/titanium_card.dart';
 import '../widgets/transfer_dialog.dart';
 
@@ -56,6 +57,14 @@ class _AssetScreenState extends State<AssetScreen> {
             title: const Text('Kantong Aset & Analisis', style: TextStyle(fontWeight: FontWeight.bold)),
             actions: [
               IconButton(
+                icon: Icon(
+                  s.privacyMode ? Icons.visibility_off_rounded : Icons.visibility_rounded,
+                  color: s.privacyMode ? AppTheme.solarAmber : Colors.white70,
+                ),
+                tooltip: s.privacyMode ? 'Tampilkan Saldo' : 'Sembunyikan Saldo (Privasi)',
+                onPressed: s.togglePrivacyMode,
+              ),
+              IconButton(
                 icon: const Icon(Icons.swap_horiz_rounded),
                 tooltip: 'Pindah Saldo',
                 onPressed: () => TransferDialog.show(
@@ -84,6 +93,7 @@ class _AssetScreenState extends State<AssetScreen> {
                   cashBalance: cash,
                   savingsBalance: savings,
                   otherAssetsBalance: s.customAssets.fold(0.0, (sum, a) => sum + a.balance),
+                  privacyMode: s.privacyMode,
                   onTransfer: () => TransferDialog.show(
                     context,
                     storageService: s,
@@ -162,7 +172,7 @@ class _AssetScreenState extends State<AssetScreen> {
                                   ),
                                 ),
                                 Text(
-                                  CurrencyFormatter.formatRp(slice.amount),
+                                  s.privacyMode ? 'Rp •••' : CurrencyFormatter.formatRp(slice.amount),
                                   style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: slice.color),
                                 ),
                               ],
@@ -202,6 +212,7 @@ class _AssetScreenState extends State<AssetScreen> {
                   color: const Color(0xFF10B981),
                   icon: Icons.payments_outlined,
                   isDark: isDark,
+                  privacyMode: s.privacyMode,
                   onTransfer: () {
                     TransferDialog.show(
                       context,
@@ -218,6 +229,7 @@ class _AssetScreenState extends State<AssetScreen> {
                   color: const Color(0xFF06B6D4),
                   icon: Icons.savings_outlined,
                   isDark: isDark,
+                  privacyMode: s.privacyMode,
                   onTransfer: () {
                     TransferDialog.show(
                       context,
@@ -235,6 +247,7 @@ class _AssetScreenState extends State<AssetScreen> {
                     color: asset.color,
                     icon: asset.icon,
                     isDark: isDark,
+                    privacyMode: s.privacyMode,
                     onTransfer: () {
                       TransferDialog.show(
                         context,
@@ -281,7 +294,15 @@ class _AssetScreenState extends State<AssetScreen> {
 
                 // Kurva Pertumbuhan Tabungan (Savings Growth Curve)
                 _buildSavingsGrowthChart(s, isDark),
-                const SizedBox(height: 30),
+                const SizedBox(height: 24),
+
+                // Detektor Bocor Halus & Analisis Kebiasaan
+                if (s.entries.isNotEmpty) ...[
+                  const Text('Deteksi Kebocoran Finansial', style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 12),
+                  LeakAnalysisCard(entries: s.entries.toList()),
+                  const SizedBox(height: 30),
+                ],
               ],
             ),
           ),
@@ -353,7 +374,7 @@ class _AssetScreenState extends State<AssetScreen> {
                 border: Border.all(color: const Color(0xFF06B6D4).withValues(alpha: 0.3)),
               ),
               child: Text(
-                CurrencyFormatter.formatShort(s.savingsBalance),
+                s.privacyMode ? 'Rp •••' : CurrencyFormatter.formatShort(s.savingsBalance),
                 style: const TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.bold,
@@ -542,6 +563,7 @@ class _AssetScreenState extends State<AssetScreen> {
     required Color color,
     required IconData icon,
     required bool isDark,
+    bool privacyMode = false,
     VoidCallback? onTransfer,
     VoidCallback? onEdit,
     VoidCallback? onDetailEdit,
@@ -571,7 +593,7 @@ class _AssetScreenState extends State<AssetScreen> {
                     children: [
                       Text(title, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14), overflow: TextOverflow.ellipsis),
                       Text(
-                        CurrencyFormatter.formatRp(amount),
+                        privacyMode ? 'Rp ••••••••' : CurrencyFormatter.formatRp(amount),
                         style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: color),
                       ),
                     ],
@@ -585,20 +607,29 @@ class _AssetScreenState extends State<AssetScreen> {
             children: [
               if (onTransfer != null)
                 IconButton(
-                  icon: const Icon(Icons.swap_horiz_rounded, size: 20),
+                  visualDensity: VisualDensity.compact,
+                  padding: const EdgeInsets.all(4),
+                  constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+                  icon: const Icon(Icons.swap_horiz_rounded, size: 19),
                   color: const Color(0xFF6366F1),
                   onPressed: onTransfer,
                   tooltip: 'Pindahkan Dana',
                 ),
               if (onEdit != null)
                 IconButton(
-                  icon: const Icon(Icons.edit_outlined, size: 18),
+                  visualDensity: VisualDensity.compact,
+                  padding: const EdgeInsets.all(4),
+                  constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+                  icon: const Icon(Icons.edit_outlined, size: 17),
                   onPressed: onEdit,
                   tooltip: 'Ubah Saldo Manual',
                 ),
               if (onDetailEdit != null)
                 IconButton(
-                  icon: const Icon(Icons.more_horiz, size: 18),
+                  visualDensity: VisualDensity.compact,
+                  padding: const EdgeInsets.all(4),
+                  constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+                  icon: const Icon(Icons.more_horiz, size: 17),
                   onPressed: onDetailEdit,
                   tooltip: 'Opsi Aset',
                 ),
@@ -631,17 +662,25 @@ class _AssetScreenState extends State<AssetScreen> {
               children: [
                 Row(
                   children: [
-                    Text(
-                      t.fromPocketName,
-                      style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 12),
+                    Flexible(
+                      child: Text(
+                        t.fromPocketName,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 12),
+                      ),
                     ),
                     const Padding(
                       padding: EdgeInsets.symmetric(horizontal: 4),
                       child: Icon(Icons.arrow_forward_rounded, size: 12, color: Colors.grey),
                     ),
-                    Text(
-                      t.toPocketName,
-                      style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 12),
+                    Flexible(
+                      child: Text(
+                        t.toPocketName,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 12),
+                      ),
                     ),
                   ],
                 ),
@@ -661,7 +700,7 @@ class _AssetScreenState extends State<AssetScreen> {
             ),
           ),
           Text(
-            CurrencyFormatter.formatRp(t.amount),
+            s.privacyMode ? 'Rp •••' : CurrencyFormatter.formatRp(t.amount),
             style: const TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: 14,

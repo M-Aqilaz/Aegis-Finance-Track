@@ -57,28 +57,35 @@ class TitaniumCard extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Row(
-                  children: [
-                    Container(
-                      width: 8,
-                      height: 8,
-                      decoration: const BoxDecoration(
-                        color: AppTheme.cyberMint,
-                        shape: BoxShape.circle,
+                Expanded(
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 8,
+                        height: 8,
+                        decoration: const BoxDecoration(
+                          color: AppTheme.cyberMint,
+                          shape: BoxShape.circle,
+                        ),
                       ),
-                    ),
-                    const SizedBox(width: 8),
-                    const Text(
-                      'TOTAL KEKAYAAN BERSIH (NET WORTH)',
-                      style: TextStyle(
-                        color: Colors.white60,
-                        fontSize: 10.5,
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: 1.0,
+                      const SizedBox(width: 8),
+                      const Expanded(
+                        child: Text(
+                          'TOTAL KEKAYAAN BERSIH',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: Colors.white60,
+                            fontSize: 10.5,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: 1.0,
+                          ),
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
+                const SizedBox(width: 8),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                   decoration: BoxDecoration(
@@ -96,7 +103,7 @@ class TitaniumCard extends StatelessWidget {
                       ),
                       const SizedBox(width: 4),
                       Text(
-                        privacyMode ? 'Privasi Aktif' : 'Terkonsolidasi',
+                        privacyMode ? 'Privasi' : 'Terkonsolidasi',
                         style: TextStyle(
                           fontSize: 9.5,
                           fontWeight: FontWeight.w700,
@@ -112,21 +119,38 @@ class TitaniumCard extends StatelessWidget {
 
             const SizedBox(height: 10),
 
-            // Large Net Worth Number
+            // Large Net Worth Number (With Smooth Count-Up Animation)
             SizedBox(
               width: double.infinity,
               child: FittedBox(
                 fit: BoxFit.scaleDown,
                 alignment: Alignment.centerLeft,
-                child: Text(
-                  privacyMode ? 'Rp ••••••••' : CurrencyFormatter.formatRp(totalAllAssets),
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 34,
-                    fontWeight: FontWeight.w900,
-                    letterSpacing: -0.6,
-                  ),
-                ),
+                child: privacyMode
+                    ? const Text(
+                        'Rp ••••••••',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 34,
+                          fontWeight: FontWeight.w900,
+                          letterSpacing: -0.6,
+                        ),
+                      )
+                    : TweenAnimationBuilder<double>(
+                        tween: Tween<double>(begin: 0, end: totalAllAssets),
+                        duration: const Duration(milliseconds: 500),
+                        curve: Curves.easeOutCubic,
+                        builder: (context, val, _) {
+                          return Text(
+                            CurrencyFormatter.formatRp(val),
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 34,
+                              fontWeight: FontWeight.w900,
+                              letterSpacing: -0.6,
+                            ),
+                          );
+                        },
+                      ),
               ),
             ),
 
@@ -146,6 +170,8 @@ class TitaniumCard extends StatelessWidget {
                     Expanded(
                       child: Text(
                         'Freedom Runway: ~${runwayDays!.toStringAsFixed(0)} Hari Bebas Beban',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
                           color: Colors.white70,
                           fontSize: 10.5,
@@ -153,9 +179,10 @@ class TitaniumCard extends StatelessWidget {
                         ),
                       ),
                     ),
+                    const SizedBox(width: 6),
                     if (safeDailySpend != null && safeDailySpend! > 0)
                       Text(
-                        'Aman: ${CurrencyFormatter.formatShort(safeDailySpend!)}/hari',
+                        'Aman: ${CurrencyFormatter.formatShort(safeDailySpend!)}/hr',
                         style: const TextStyle(
                           color: AppTheme.cyberMint,
                           fontSize: 10.5,
@@ -178,34 +205,39 @@ class TitaniumCard extends StatelessWidget {
                 border: Border.all(color: AppTheme.borderLight),
               ),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   // Cash
-                  _buildSubItem(
-                    label: 'Kas Tunai',
-                    amount: cashBalance,
-                    color: AppTheme.cyberMint,
-                    privacyMode: privacyMode,
+                  Expanded(
+                    child: _buildSubItem(
+                      label: 'Kas Tunai',
+                      amount: cashBalance,
+                      color: AppTheme.cyberMint,
+                      privacyMode: privacyMode,
+                    ),
                   ),
 
-                  Container(width: 1, height: 26, color: Colors.white12),
+                  Container(width: 1, height: 26, color: Colors.white12, margin: const EdgeInsets.symmetric(horizontal: 4)),
 
                   // Tabungan
-                  _buildSubItem(
-                    label: 'Tabungan',
-                    amount: savingsBalance,
-                    color: AppTheme.electricCyan,
-                    privacyMode: privacyMode,
+                  Expanded(
+                    child: _buildSubItem(
+                      label: 'Tabungan',
+                      amount: savingsBalance,
+                      color: AppTheme.electricCyan,
+                      privacyMode: privacyMode,
+                    ),
                   ),
 
                   if (otherAssetsBalance > 0) ...[
-                    Container(width: 1, height: 26, color: Colors.white12),
+                    Container(width: 1, height: 26, color: Colors.white12, margin: const EdgeInsets.symmetric(horizontal: 4)),
                     // Bank Lain
-                    _buildSubItem(
-                      label: 'Bank Digital',
-                      amount: otherAssetsBalance,
-                      color: AppTheme.solarAmber,
-                      privacyMode: privacyMode,
+                    Expanded(
+                      child: _buildSubItem(
+                        label: 'Bank Digital',
+                        amount: otherAssetsBalance,
+                        color: AppTheme.solarAmber,
+                        privacyMode: privacyMode,
+                      ),
                     ),
                   ],
                 ],
@@ -270,21 +302,34 @@ class TitaniumCard extends StatelessWidget {
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
       children: [
         Row(
+          mainAxisSize: MainAxisSize.min,
           children: [
             Container(width: 6, height: 6, decoration: BoxDecoration(color: color, shape: BoxShape.circle)),
             const SizedBox(width: 5),
-            Text(label, style: const TextStyle(color: Colors.white60, fontSize: 10.5, fontWeight: FontWeight.w600)),
+            Flexible(
+              child: Text(
+                label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(color: Colors.white60, fontSize: 10.5, fontWeight: FontWeight.w600),
+              ),
+            ),
           ],
         ),
         const SizedBox(height: 3),
-        Text(
-          privacyMode ? 'Rp •••' : CurrencyFormatter.formatShort(amount),
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 13.5,
-            fontWeight: FontWeight.bold,
+        FittedBox(
+          fit: BoxFit.scaleDown,
+          alignment: Alignment.centerLeft,
+          child: Text(
+            privacyMode ? 'Rp •••' : CurrencyFormatter.formatShort(amount),
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 13.5,
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ),
       ],
