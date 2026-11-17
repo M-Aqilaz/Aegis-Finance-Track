@@ -80,9 +80,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
         }
 
         return Scaffold(
-          backgroundColor: AppTheme.obsidianBg,
+          backgroundColor: isDark ? AppTheme.obsidianBg : Theme.of(context).scaffoldBackgroundColor,
           appBar: AppBar(
-            backgroundColor: AppTheme.obsidianBg,
+            backgroundColor: isDark ? AppTheme.obsidianBg : Theme.of(context).scaffoldBackgroundColor,
             elevation: 0,
             title: const Text(
               'Riwayat Keuangan',

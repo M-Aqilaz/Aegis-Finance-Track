@@ -137,7 +137,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     await _notificationService.requestPermissions();
     await _notificationService.showInstantNotification(
       id: 999,
-      title: '🔔 Financial Track: Pengingat Harian Berhasil!',
+      title: '🔔 Aegis Finance: Pengingat Harian Berhasil!',
       body: 'Pengeluaran hari ini sudah dicatat? Cek sisa saldo & tabunganmu sekarang!',
     );
 
@@ -145,7 +145,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Notifikasi uji coba telah dikirimkan ke bar notifikasi!'),
-          backgroundColor: Color(0xFF6366F1),
+          backgroundColor: AppTheme.cyberMint,
         ),
       );
     }
@@ -159,9 +159,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
         '${s.reminderHour.toString().padLeft(2, '0')}:${s.reminderMinute.toString().padLeft(2, '0')} WIB';
 
     return Scaffold(
-      backgroundColor: AppTheme.obsidianBg,
+      backgroundColor: isDark ? AppTheme.obsidianBg : Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: AppTheme.obsidianBg,
+        backgroundColor: isDark ? AppTheme.obsidianBg : Theme.of(context).scaffoldBackgroundColor,
         elevation: 0,
         title: const Text(
           'Pengaturan & Notifikasi',
@@ -229,7 +229,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 SwitchListTile(
                   title: const Text('Pengingat Harian', style: TextStyle(fontWeight: FontWeight.w600)),
                   value: s.reminderEnabled,
-                  activeThumbColor: const Color(0xFF6366F1),
+                  activeThumbColor: AppTheme.cyberMint,
                   onChanged: _toggleReminder,
                 ),
                 const Divider(height: 1),
@@ -243,9 +243,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
                 const Divider(height: 1),
                 ListTile(
-                  leading: const Icon(Icons.notification_add, color: Color(0xFF6366F1)),
-                  title: const Text('Uji Notifikasi', style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF6366F1))),
-                  trailing: const Icon(Icons.play_arrow_rounded, color: Color(0xFF6366F1)),
+                  leading: const Icon(Icons.notification_add, color: AppTheme.cyberMint),
+                  title: const Text('Uji Notifikasi', style: TextStyle(fontWeight: FontWeight.bold, color: AppTheme.cyberMint)),
+                  trailing: const Icon(Icons.play_arrow_rounded, color: AppTheme.cyberMint),
                   onTap: _testInstantNotification,
                 ),
               ],
@@ -260,7 +260,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             child: Column(
               children: [
                 ListTile(
-                  leading: const Icon(Icons.phonelink_setup_rounded, color: Color(0xFF6366F1)),
+                  leading: const Icon(Icons.phonelink_setup_rounded, color: AppTheme.electricCyan),
                   title: const Text('Pusat Cadangan & Pindah HP', style: TextStyle(fontWeight: FontWeight.bold)),
                   subtitle: const Text('Simpan/pulihkan file cadangan atau kirim kode via WA', style: TextStyle(fontSize: 12)),
                   trailing: const Icon(Icons.arrow_forward_ios, size: 14),

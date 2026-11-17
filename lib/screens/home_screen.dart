@@ -38,14 +38,15 @@ class HomeScreen extends StatelessWidget {
         final todayEntry = storageService.getEntryByDate(now);
         final todayExpense = todayEntry?.totalExpense ?? 0.0;
         final dailyLimit = storageService.dailyExpenseLimit;
+        final isDark = Theme.of(context).brightness == Brightness.dark;
 
         return Scaffold(
-          backgroundColor: AppTheme.obsidianBg,
+          backgroundColor: isDark ? AppTheme.obsidianBg : Theme.of(context).scaffoldBackgroundColor,
           body: CustomScrollView(
             slivers: [
               // Signature Branded Header Bar
               SliverAppBar(
-                backgroundColor: AppTheme.obsidianBg,
+                backgroundColor: isDark ? AppTheme.obsidianBg : Theme.of(context).scaffoldBackgroundColor,
                 pinned: true,
                 floating: true,
                 elevation: 0,
