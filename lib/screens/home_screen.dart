@@ -55,55 +55,62 @@ class HomeScreen extends StatelessWidget {
                   children: [
                     // FinTrack Mascot Phoenix Emblem
                     Container(
-                      width: 42,
-                      height: 42,
+                      width: 38,
+                      height: 38,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         boxShadow: [
                           BoxShadow(
                             color: AppTheme.cyberMint.withValues(alpha: 0.35),
-                            blurRadius: 14,
-                            offset: const Offset(0, 3),
+                            blurRadius: 12,
+                            offset: const Offset(0, 2),
                           ),
                         ],
                       ),
                       child: ClipOval(
                         child: Image.asset(
                           'assets/icon/fintrack_mascot.png',
-                          width: 42,
-                          height: 42,
+                          width: 38,
+                          height: 38,
                           fit: BoxFit.cover,
                           errorBuilder: (context, error, stackTrace) => Container(
                             color: AppTheme.surfaceCardElevated,
-                            child: const Icon(Icons.diamond_rounded, color: AppTheme.cyberMint),
+                            child: const Icon(Icons.diamond_rounded, color: AppTheme.cyberMint, size: 20),
                           ),
                         ),
                       ),
                     ),
-                    const SizedBox(width: 12),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          'AEGIS FINANCE',
-                          style: TextStyle(
-                            fontSize: 17,
-                            fontWeight: FontWeight.w900,
-                            letterSpacing: 1.2,
-                            color: Colors.white,
+                    const SizedBox(width: 10),
+                    const Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            'AEGIS FINANCE',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w900,
+                              letterSpacing: 1.0,
+                              color: Colors.white,
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 2),
-                        const Text(
-                          'Smart Wealth Guardian',
-                          style: TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w600,
-                            color: AppTheme.cyberMint,
-                            letterSpacing: 0.5,
+                          SizedBox(height: 1),
+                          Text(
+                            'Smart Wealth Guardian',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontSize: 10.5,
+                              fontWeight: FontWeight.w600,
+                              color: AppTheme.cyberMint,
+                              letterSpacing: 0.4,
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ],
                 ),
@@ -163,25 +170,6 @@ class HomeScreen extends StatelessWidget {
                     ),
                     tooltip: privacyMode ? 'Tampilkan Saldo' : 'Sembunyikan Saldo (Privasi)',
                     onPressed: storageService.togglePrivacyMode,
-                  ),
-
-                  // Quick Log Action (Catat Transaksi 3 Detik)
-                  IconButton(
-                    icon: Container(
-                      padding: const EdgeInsets.all(7),
-                      decoration: BoxDecoration(
-                        color: AppTheme.cyberMint.withValues(alpha: 0.15),
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: AppTheme.cyberMint.withValues(alpha: 0.4)),
-                      ),
-                      child: const Icon(
-                        Icons.bolt_rounded,
-                        size: 20,
-                        color: AppTheme.cyberMint,
-                      ),
-                    ),
-                    tooltip: 'Catat Transaksi 3 Detik',
-                    onPressed: () => QuickLogBottomSheet.show(context, storageService: storageService),
                   ),
                   const SizedBox(width: 8),
                 ],

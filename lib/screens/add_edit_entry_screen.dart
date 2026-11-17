@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 import '../models/transaction_entry.dart';
 import '../services/storage_service.dart';
+import '../utils/app_theme.dart';
 import '../utils/currency_formatter.dart';
 
 class AddEditEntryScreen extends StatefulWidget {
@@ -26,6 +27,7 @@ class _AddEditEntryScreenState extends State<AddEditEntryScreen> {
 
   final List<ExpenseItem> _expenseItems = [];
   bool _showItems = false;
+  ExpenseCategory _activeCategory = ExpenseCategory.makanan;
 
   @override
   void initState() {
@@ -38,6 +40,9 @@ class _AddEditEntryScreenState extends State<AddEditEntryScreen> {
       _saveController.text = e.saveAmount > 0 ? e.saveAmount.toInt().toString() : '';
       _expenseItems.addAll(e.expenses);
       _showItems = e.expenses.isNotEmpty;
+      if (e.expenses.isNotEmpty) {
+        _activeCategory = e.expenses.first.category;
+      }
     } else {
       _selectedDate = DateTime.now();
       final todayExisting = widget.storageService.getEntryByDate(_selectedDate);
@@ -105,10 +110,24 @@ class _AddEditEntryScreenState extends State<AddEditEntryScreen> {
     }
   }
 
+  void _addQuickAmount(TextEditingController controller, int addValue) {
+    final current = CurrencyFormatter.parseAmount(controller.text);
+    final next = (current + addValue).toInt();
+    setState(() {
+      controller.text = next.toString();
+    });
+  }
+
+  void _clearAmount(TextEditingController controller) {
+    setState(() {
+      controller.text = '0';
+    });
+  }
+
   void _showAddExpenseDialog() {
     final titleController = TextEditingController();
     final amountController = TextEditingController();
-    ExpenseCategory selectedCat = ExpenseCategory.makanan;
+    ExpenseCategory selectedCat = _activeCategory;
 
     showModalBottomSheet(
       context: context,
@@ -125,8 +144,9 @@ class _AddEditEntryScreenState extends State<AddEditEntryScreen> {
               bottom: MediaQuery.of(context).viewInsets.bottom + 24,
             ),
             decoration: BoxDecoration(
-              color: isDark ? const Color(0xFF1E293B) : Colors.white,
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+              color: isDark ? AppTheme.surfaceCard : Colors.white,
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+              border: Border.all(color: AppTheme.borderLight),
             ),
             child: SingleChildScrollView(
               child: Column(
@@ -137,7 +157,7 @@ class _AddEditEntryScreenState extends State<AddEditEntryScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       const Text(
-                        'Tambah Item Pengeluaran',
+                        'Tambah Rincian Item',
                         style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                       ),
                       IconButton(
@@ -149,21 +169,26 @@ class _AddEditEntryScreenState extends State<AddEditEntryScreen> {
                   const SizedBox(height: 12),
                   TextField(
                     controller: titleController,
+                    style: const TextStyle(fontWeight: FontWeight.w600),
                     decoration: InputDecoration(
-                      labelText: 'Nama Item',
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                      labelText: 'Nama Item (Contoh: Nasi Goreng, Bensin)',
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                     ),
                   ),
                   const SizedBox(height: 12),
                   TextField(
                     controller: amountController,
+                    keyboardType: TextInputType.text,
+                    style: const TextStyle(fontWeight: FontWeight.bold),
                     decoration: InputDecoration(
                       labelText: 'Nominal',
-                      hintText: 'Contoh: 15k atau 15000',
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                      hintText: 'Contoh: 15k, 25000, 50rb',
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                     ),
                   ),
                   const SizedBox(height: 14),
+                  const Text('Pilih Kategori:', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.grey)),
+                  const SizedBox(height: 8),
                   Wrap(
                     spacing: 8,
                     runSpacing: 8,
@@ -171,8 +196,9 @@ class _AddEditEntryScreenState extends State<AddEditEntryScreen> {
                       final isSelected = selectedCat == cat;
                       return ChoiceChip(
                         selected: isSelected,
+                        avatar: Icon(cat.icon, size: 14, color: isSelected ? Colors.white : cat.color),
                         label: Text(cat.displayName.split('(').first.trim()),
-                        selectedColor: cat.color.withValues(alpha: 0.3),
+                        selectedColor: cat.color.withValues(alpha: 0.35),
                         onSelected: (val) {
                           if (val) {
                             setModalState(() {
@@ -189,9 +215,9 @@ class _AddEditEntryScreenState extends State<AddEditEntryScreen> {
                     height: 48,
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF6366F1),
-                        foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                        backgroundColor: AppTheme.cyberMint,
+                        foregroundColor: Colors.black87,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                       ),
                       onPressed: () {
                         final title = titleController.text.trim();
@@ -209,7 +235,6 @@ class _AddEditEntryScreenState extends State<AddEditEntryScreen> {
                             amount: amount,
                             category: selectedCat,
                           ));
-                          // Update total expense
                           final sum = _expenseItems.fold(0.0, (s, i) => s + i.amount);
                           _expenseController.text = sum.toInt().toString();
                           _showItems = true;
@@ -250,6 +275,21 @@ class _AddEditEntryScreenState extends State<AddEditEntryScreen> {
 
     if (mounted) {
       Navigator.pop(context);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Row(
+            children: [
+              const Icon(Icons.check_circle_rounded, color: Colors.white, size: 20),
+              const SizedBox(width: 8),
+              Text(
+                'Catatan ${CurrencyFormatter.formatDate(_selectedDate)} tersimpan!',
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ],
+          ),
+          backgroundColor: AppTheme.cyberMint,
+        ),
+      );
     }
   }
 
@@ -258,295 +298,493 @@ class _AddEditEntryScreenState extends State<AddEditEntryScreen> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
+      backgroundColor: isDark ? AppTheme.obsidianBg : Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
+        backgroundColor: isDark ? AppTheme.obsidianBg : Theme.of(context).scaffoldBackgroundColor,
+        elevation: 0,
         title: Text(
-          widget.existingEntry == null ? 'Catat Harian' : 'Ubah Catatan',
-          style: const TextStyle(fontWeight: FontWeight.bold),
+          widget.existingEntry == null ? 'Catat Keuangan Harian' : 'Ubah Catatan Keuangan',
+          style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 17),
         ),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.check, size: 28),
-            color: const Color(0xFF10B981),
+          TextButton.icon(
+            style: TextButton.styleFrom(foregroundColor: AppTheme.cyberMint),
+            icon: const Icon(Icons.check_circle_rounded, size: 20),
+            label: const Text('SIMPAN', style: TextStyle(fontWeight: FontWeight.w900)),
             onPressed: _saveAll,
           ),
+          const SizedBox(width: 8),
         ],
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Date Card
+            // 1. Sleek Date Picker Bar
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              decoration: BoxDecoration(
-                color: isDark ? const Color(0xFF1E293B) : Colors.white,
-                borderRadius: BorderRadius.circular(14),
-                border: Border.all(
-                  color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
-                ),
-              ),
+              decoration: AppTheme.glassCardDecoration(borderRadius: 16),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Row(
                     children: [
-                      const Icon(Icons.calendar_today, size: 18, color: Color(0xFF6366F1)),
-                      const SizedBox(width: 10),
-                      Text(
-                        CurrencyFormatter.formatDate(_selectedDate),
-                        style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: AppTheme.cyberMint.withValues(alpha: 0.15),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: const Icon(Icons.calendar_today_rounded, size: 18, color: AppTheme.cyberMint),
+                      ),
+                      const SizedBox(width: 12),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text('TANGGAL CATATAN', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.grey, letterSpacing: 0.5)),
+                          const SizedBox(height: 2),
+                          Text(
+                            CurrencyFormatter.formatDate(_selectedDate),
+                            style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w800),
+                          ),
+                        ],
                       ),
                     ],
                   ),
-                  TextButton(
+                  OutlinedButton.icon(
+                    style: OutlinedButton.styleFrom(
+                      side: BorderSide(color: AppTheme.cyberMint.withValues(alpha: 0.4)),
+                      foregroundColor: AppTheme.cyberMint,
+                      visualDensity: VisualDensity.compact,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    ),
                     onPressed: _pickDate,
-                    child: const Text('Ganti'),
+                    icon: const Icon(Icons.edit_calendar_rounded, size: 16),
+                    label: const Text('Ganti', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
                   ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 14),
+
+            // 2. Financial Impact Balance Card (Live Real-Time Feedback)
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: AppTheme.surfaceCard,
+                borderRadius: BorderRadius.circular(18),
+                border: Border.all(color: AppTheme.borderLight),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.3),
+                    blurRadius: 12,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Container(width: 6, height: 6, decoration: const BoxDecoration(color: AppTheme.cyberMint, shape: BoxShape.circle)),
+                            const SizedBox(width: 6),
+                            const Text('Sisa Kas Berjalan', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Colors.grey)),
+                          ],
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          CurrencyFormatter.formatRp(_calculatedSisa),
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w900,
+                            color: _calculatedSisa >= 0 ? Colors.white : AppTheme.neonCoral,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Container(width: 1, height: 38, color: Colors.white12),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Container(width: 6, height: 6, decoration: const BoxDecoration(color: AppTheme.electricCyan, shape: BoxShape.circle)),
+                            const SizedBox(width: 6),
+                            const Text('Total Simpanan', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Colors.grey)),
+                          ],
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          CurrencyFormatter.formatRp(_calculatedTotalSimpan),
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w900,
+                            color: AppTheme.electricCyan,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 18),
+
+            // Friendly Help Pill explaining input formats
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.04),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.white10),
+              ),
+              child: const Row(
+                children: [
+                  Icon(Icons.tips_and_updates_outlined, size: 16, color: AppTheme.solarAmber),
+                  SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'Bisa ketik angka langsung (misal: 25000) atau singkatan cepat (misal: 25k, 50rb, 1.5jt)',
+                      style: TextStyle(fontSize: 11, color: Colors.white70),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 18),
+
+            // 3. SECTION PENGELUARAN (Uang Keluar)
+            _buildTransactionCard(
+              title: 'PENGELUARAN (UANG KELUAR)',
+              accentColor: AppTheme.neonCoral,
+              icon: Icons.arrow_downward_rounded,
+              controller: _expenseController,
+              currentAmount: _currentExpense,
+              quickChips: [5000, 10000, 20000, 50000, 100000],
+              extraAction: TextButton.icon(
+                style: TextButton.styleFrom(
+                  visualDensity: VisualDensity.compact,
+                  foregroundColor: AppTheme.neonCoral,
+                ),
+                onPressed: _showAddExpenseDialog,
+                icon: const Icon(Icons.playlist_add_rounded, size: 16),
+                label: const Text('+ Rincian Item', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Category chips
+                  const Text('Kategori Utama:', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: Colors.grey)),
+                  const SizedBox(height: 6),
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: ExpenseCategory.values.map((cat) {
+                        final isSel = _activeCategory == cat;
+                        return Padding(
+                          padding: const EdgeInsets.only(right: 6),
+                          child: ChoiceChip(
+                            selected: isSel,
+                            avatar: Icon(cat.icon, size: 13, color: isSel ? Colors.white : cat.color),
+                            label: Text(
+                              cat.displayName.split('(').first.trim(),
+                              style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: isSel ? FontWeight.w800 : FontWeight.w500,
+                                color: isSel ? Colors.white : Colors.white70,
+                              ),
+                            ),
+                            selectedColor: cat.color.withValues(alpha: 0.35),
+                            onSelected: (val) {
+                              if (val) {
+                                setState(() => _activeCategory = cat);
+                              }
+                            },
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  ),
+
+                  // Itemized expenses list if available
+                  if (_showItems && _expenseItems.isNotEmpty) ...[
+                    const SizedBox(height: 12),
+                    const Divider(color: Colors.white12),
+                    const SizedBox(height: 4),
+                    const Text('Daftar Rincian Item:', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.white70)),
+                    const SizedBox(height: 6),
+                    ..._expenseItems.map((item) {
+                      return Container(
+                        margin: const EdgeInsets.only(bottom: 6),
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.04),
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(color: Colors.white10),
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(item.category.icon, size: 14, color: item.category.color),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                item.title,
+                                style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+                              ),
+                            ),
+                            Text(
+                              CurrencyFormatter.formatRp(item.amount),
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                                color: item.category.color,
+                              ),
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.close_rounded, size: 16, color: Colors.grey),
+                              onPressed: () {
+                                setState(() {
+                                  _expenseItems.remove(item);
+                                  final sum = _expenseItems.fold(0.0, (s, i) => s + i.amount);
+                                  _expenseController.text = sum > 0 ? sum.toInt().toString() : '0';
+                                });
+                              },
+                            ),
+                          ],
+                        ),
+                      );
+                    }),
+                  ],
                 ],
               ),
             ),
 
             const SizedBox(height: 16),
 
-            // Live Calculated Balance Card
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [Color(0xFF4F46E5), Color(0xFF6366F1)],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      Column(
-                        children: [
-                          const Text('Sisa', style: TextStyle(color: Colors.white70, fontSize: 12)),
-                          const SizedBox(height: 4),
-                          Text(
-                            CurrencyFormatter.formatShort(_calculatedSisa),
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                      Container(width: 1, height: 36, color: Colors.white24),
-                      Column(
-                        children: [
-                          const Text('Total Simpan', style: TextStyle(color: Colors.white70, fontSize: 12)),
-                          const SizedBox(height: 4),
-                          Text(
-                            CurrencyFormatter.formatShort(_calculatedTotalSimpan),
-                            style: const TextStyle(
-                              color: Color(0xFF67E8F9),
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 20),
-
-            // 1. Pemasukan
-            const Text('Pemasukan', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 8),
-            TextField(
+            // 4. SECTION PEMASUKAN (Uang Masuk)
+            _buildTransactionCard(
+              title: 'PEMASUKAN (UANG MASUK)',
+              accentColor: AppTheme.cyberMint,
+              icon: Icons.arrow_upward_rounded,
               controller: _incomeController,
-              keyboardType: TextInputType.text,
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: isDark ? Colors.white : Colors.black87,
-              ),
-              cursorColor: const Color(0xFF6366F1),
-              onChanged: (_) => setState(() {}),
-              decoration: InputDecoration(
-                prefixText: 'Rp ',
-                prefixStyle: TextStyle(
-                  color: const Color(0xFF10B981),
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
-                ),
-                hintText: 'Misal: 50k atau 50000',
-                hintStyle: TextStyle(color: isDark ? Colors.white30 : Colors.black26),
-                filled: true,
-                fillColor: isDark ? const Color(0xFF1E293B) : Colors.white,
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-              ),
+              currentAmount: _currentIncome,
+              quickChips: [20000, 50000, 100000, 250000, 500000],
             ),
-            const SizedBox(height: 6),
-            _buildChips(['30k', '40k', '50k', '100k'], (val) {
-              setState(() {
-                _incomeController.text = val;
-              });
-            }),
 
-            const SizedBox(height: 18),
+            const SizedBox(height: 16),
 
-            // 2. Pengeluaran
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text('Pengeluaran', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
-                TextButton.icon(
-                  onPressed: _showAddExpenseDialog,
-                  icon: const Icon(Icons.add, size: 16),
-                  label: const Text('Rincian Item'),
-                ),
-              ],
-            ),
-            TextField(
-              controller: _expenseController,
-              keyboardType: TextInputType.text,
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: isDark ? Colors.white : Colors.black87,
-              ),
-              cursorColor: const Color(0xFF6366F1),
-              onChanged: (_) => setState(() {}),
-              decoration: InputDecoration(
-                prefixText: 'Rp ',
-                prefixStyle: const TextStyle(
-                  color: Color(0xFFEF4444),
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
-                ),
-                hintText: 'Misal: 19k atau 19000',
-                hintStyle: TextStyle(color: isDark ? Colors.white30 : Colors.black26),
-                filled: true,
-                fillColor: isDark ? const Color(0xFF1E293B) : Colors.white,
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-              ),
-            ),
-            const SizedBox(height: 6),
-            _buildChips(['0', '10k', '18k', '19k', '25k'], (val) {
-              setState(() {
-                _expenseController.text = val;
-              });
-            }),
-
-            // List of items if added
-            if (_showItems && _expenseItems.isNotEmpty) ...[
-              const SizedBox(height: 10),
-              ..._expenseItems.map((item) {
-                return Card(
-                  margin: const EdgeInsets.only(bottom: 6),
-                  child: ListTile(
-                    dense: true,
-                    title: Text(item.title, style: const TextStyle(fontWeight: FontWeight.w600)),
-                    trailing: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          CurrencyFormatter.formatRp(item.amount),
-                          style: TextStyle(color: item.category.color, fontWeight: FontWeight.bold),
-                        ),
-                        IconButton(
-                          icon: const Icon(Icons.close, size: 16),
-                          onPressed: () {
-                            setState(() {
-                              _expenseItems.remove(item);
-                              final sum = _expenseItems.fold(0.0, (s, i) => s + i.amount);
-                              _expenseController.text = sum > 0 ? sum.toInt().toString() : '0';
-                            });
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              }),
-            ],
-
-            const SizedBox(height: 18),
-
-            // 3. Save
-            const Text('Save', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 8),
-            TextField(
+            // 5. SECTION NABUNG VAULT (Tabungan)
+            _buildTransactionCard(
+              title: 'NABUNG VAULT (SIMPANAN)',
+              accentColor: AppTheme.electricCyan,
+              icon: Icons.savings_rounded,
               controller: _saveController,
-              keyboardType: TextInputType.text,
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: isDark ? Colors.white : Colors.black87,
-              ),
-              cursorColor: const Color(0xFF6366F1),
-              onChanged: (_) => setState(() {}),
-              decoration: InputDecoration(
-                prefixText: 'Rp ',
-                prefixStyle: const TextStyle(
-                  color: Color(0xFF3B82F6),
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
-                ),
-                hintText: 'Misal: 5k atau 10k',
-                hintStyle: TextStyle(color: isDark ? Colors.white30 : Colors.black26),
-                filled: true,
-                fillColor: isDark ? const Color(0xFF1E293B) : Colors.white,
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-              ),
+              currentAmount: _currentSave,
+              quickChips: [10000, 20000, 50000, 100000, 200000],
             ),
-            const SizedBox(height: 6),
-            _buildChips(['0', '5k', '10k', '20k', '50k'], (val) {
-              setState(() {
-                _saveController.text = val;
-              });
-            }),
 
-            const SizedBox(height: 30),
+            const SizedBox(height: 24),
 
-            // Save Button
+            // 6. Primary Save Action Button
             SizedBox(
               width: double.infinity,
-              height: 50,
+              height: 52,
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF6366F1),
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  backgroundColor: AppTheme.cyberMint,
+                  foregroundColor: Colors.black87,
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                 ),
                 onPressed: _saveAll,
-                child: const Text('Simpan', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                child: const Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.check_circle_rounded, size: 22, color: Colors.black87),
+                    SizedBox(width: 8),
+                    Text(
+                      'Simpan Perubahan Catatan',
+                      style: TextStyle(fontSize: 15, fontWeight: FontWeight.w900, letterSpacing: 0.3),
+                    ),
+                  ],
+                ),
               ),
             ),
+
+            const SizedBox(height: 30),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildChips(List<String> items, Function(String) onSelect) {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Row(
-        children: items.map((val) {
-          return Padding(
-            padding: const EdgeInsets.only(right: 6),
-            child: ActionChip(
-              visualDensity: VisualDensity.compact,
-              label: Text(val, style: const TextStyle(fontSize: 12)),
-              onPressed: () => onSelect(val),
+  Widget _buildTransactionCard({
+    required String title,
+    required Color accentColor,
+    required IconData icon,
+    required TextEditingController controller,
+    required double currentAmount,
+    required List<int> quickChips,
+    Widget? extraAction,
+    Widget? child,
+  }) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppTheme.surfaceCard,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(
+          color: currentAmount > 0 ? accentColor.withValues(alpha: 0.35) : AppTheme.borderLight,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Section Header
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(6),
+                    decoration: BoxDecoration(
+                      color: accentColor.withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Icon(icon, size: 16, color: accentColor),
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    title,
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 0.8,
+                      color: accentColor,
+                    ),
+                  ),
+                ],
+              ),
+              ?extraAction,
+            ],
+          ),
+
+          const SizedBox(height: 12),
+
+          // Nominal Display & Live Preview
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+            decoration: BoxDecoration(
+              color: AppTheme.obsidianBg,
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(color: AppTheme.borderLight),
             ),
-          );
-        }).toList(),
+            child: Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: controller,
+                    keyboardType: TextInputType.text,
+                    style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: Colors.white),
+                    cursorColor: accentColor,
+                    onChanged: (_) => setState(() {}),
+                    decoration: InputDecoration(
+                      isDense: true,
+                      contentPadding: const EdgeInsets.symmetric(vertical: 6),
+                      border: InputBorder.none,
+                      hintText: '0',
+                      hintStyle: const TextStyle(color: Colors.white24, fontSize: 20, fontWeight: FontWeight.w900),
+                      prefixText: 'Rp ',
+                      prefixStyle: TextStyle(
+                        color: accentColor,
+                        fontWeight: FontWeight.w900,
+                        fontSize: 18,
+                      ),
+                    ),
+                  ),
+                ),
+                Text(
+                  CurrencyFormatter.formatRp(currentAmount),
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                    color: currentAmount > 0 ? accentColor : Colors.white24,
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          const SizedBox(height: 10),
+
+          // Quick Increment Chips
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: [
+                ...quickChips.map((val) {
+                  final label = '+${CurrencyFormatter.formatShort(val.toDouble()).replaceAll('Rp ', '')}';
+                  return Padding(
+                    padding: const EdgeInsets.only(right: 6),
+                    child: InkWell(
+                      onTap: () => _addQuickAmount(controller, val),
+                      borderRadius: BorderRadius.circular(10),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                        decoration: BoxDecoration(
+                          color: AppTheme.surfaceCardElevated,
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(color: AppTheme.borderLight),
+                        ),
+                        child: Text(
+                          label,
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.bold,
+                            color: accentColor,
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                }),
+                InkWell(
+                  onTap: () => _clearAmount(controller),
+                  borderRadius: BorderRadius.circular(10),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.06),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: const Text(
+                      'Reset',
+                      style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.white60),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          if (child != null) ...[
+            const SizedBox(height: 12),
+            child,
+          ],
+        ],
       ),
     );
   }
