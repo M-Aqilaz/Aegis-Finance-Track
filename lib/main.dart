@@ -55,12 +55,11 @@ class _AegisFinanceAppState extends State<AegisFinanceApp> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = widget.storageService.themeMode != 'light';
     return MaterialApp(
       title: 'Aegis Finance',
       debugShowCheckedModeBanner: false,
-      themeMode: isDark ? ThemeMode.dark : ThemeMode.light,
-      theme: AppTheme.lightTheme,
+      themeMode: ThemeMode.dark,
+      theme: AppTheme.darkTheme,
       darkTheme: AppTheme.darkTheme,
       home: MainNavigationScreen(storageService: widget.storageService),
     );

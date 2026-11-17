@@ -122,11 +122,10 @@ class LeakAnalysis {
         warnings.add(LeakWarning(
           title: 'Bocor Halus: Jajan & Kopi Tinggi',
           message:
-              'Jajan & kopi menyerap ${jajanPct.toStringAsFixed(1)}% dari total pengeluaranmu (Rp ${jajanAmt.toInt()}).',
+              'Jajan & kopi menyerap ${jajanPct.toStringAsFixed(1)}% dari total pengeluaran (Rp ${jajanAmt.toInt()}).',
           icon: Icons.coffee,
           color: const Color(0xFFEF4444),
-          recommendation:
-              'Bawa tumbler air atau seduh kopi mandiri untuk memangkas kebocoran kecil yang menumpuk.',
+          recommendation: '',
         ));
       }
     }
@@ -134,23 +133,12 @@ class LeakAnalysis {
     // Check expense ratio
     if (expRatio > 70) {
       warnings.add(LeakWarning(
-        title: 'Pengeluaran Hampir Menyentuh Limit Pemasukan',
+        title: 'Pengeluaran Mendekati Batas Pemasukan',
         message:
-            'Total pengeluaranmu mencapai ${expRatio.toStringAsFixed(1)}% dari pemasukan. Sisakan lebih banyak untuk dana darurat.',
+            'Total pengeluaran mencapai ${expRatio.toStringAsFixed(1)}% dari total pemasukan bulan ini.',
         icon: Icons.trending_down,
         color: const Color(0xFFF59E0B),
-        recommendation:
-            'Tinjau kembali pos pengeluaran gaya hidup dan alokasikan ke tabungan (Save).',
-      ));
-    } else if (expRatio <= 30 && sumIncome > 0) {
-      warnings.add(LeakWarning(
-        title: 'Manajemen Keuangan Sangat Sehat! 🌟',
-        message:
-            'Pengeluaran hanya ${expRatio.toStringAsFixed(1)}% dari pemasukan. Arus kas operasionalmu sangat surplus.',
-        icon: Icons.verified,
-        color: const Color(0xFF10B981),
-        recommendation:
-            'Pertahankan disiplin ini dan tingkatkan alokasi tabungan (Save) harian.',
+        recommendation: '',
       ));
     }
 
@@ -159,13 +147,12 @@ class LeakAnalysis {
       final topItem = allItems.first;
       if (topItem.amount >= (sumExpense * 0.4) && sumExpense > 30000) {
         warnings.add(LeakWarning(
-          title: 'Pengeluaran Tunggal Dominan',
+          title: 'Pos Pengeluaran Dominan',
           message:
-              'Item "${topItem.title}" memakan ${((topItem.amount / sumExpense) * 100).toStringAsFixed(1)}% dari pengeluaran total.',
+              '"${topItem.title}" memakan ${((topItem.amount / sumExpense) * 100).toStringAsFixed(1)}% dari total anggaran keluar.',
           icon: Icons.account_balance_wallet,
           color: const Color(0xFF3B82F6),
-          recommendation:
-              'Pastikan pengeluaran ini bernilai produktif atau merupakan kebutuhan primer.',
+          recommendation: '',
         ));
       }
     }

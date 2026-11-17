@@ -196,31 +196,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
           ),
 
-          const SizedBox(height: 24),
-
-          // TAMPILAN SECTION
-          _buildHeader('TAMPILAN', Icons.palette_outlined),
-          Card(
-            child: SwitchListTile(
-              secondary: Icon(
-                s.themeMode == 'light' ? Icons.light_mode_rounded : Icons.dark_mode_rounded,
-                color: s.themeMode == 'light' ? AppTheme.solarAmber : AppTheme.electricCyan,
-              ),
-              title: const Text('Tema Terang (Light Mode)', style: TextStyle(fontWeight: FontWeight.w600)),
-              subtitle: Text(
-                s.themeMode == 'light' ? 'Aktif — tampilan putih bersih' : 'Nonaktif — Obsidian gelap (default)',
-                style: const TextStyle(fontSize: 12),
-              ),
-              value: s.themeMode == 'light',
-              activeThumbColor: AppTheme.solarAmber,
-              onChanged: (val) async {
-                await s.updateSettings(themeMode: val ? 'light' : 'dark');
-              },
-            ),
-          ),
-
-          const SizedBox(height: 24),
-
           // NOTIFICATION SECTION
           _buildHeader('PENGINGAT & NOTIFIKASI', Icons.notifications_active_outlined),
           Card(
@@ -327,15 +302,31 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
           ),
 
-          const SizedBox(height: 40),
+          const SizedBox(height: 36),
           Center(
-            child: Text(
-              'Aegis Finance v1.1',
-              textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 12, color: isDark ? Colors.grey[600] : Colors.grey[400]),
+            child: Column(
+              children: [
+                Text(
+                  'Aegis Finance v2.4',
+                  style: TextStyle(
+                    color: Colors.white.withValues(alpha: 0.35),
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: 0.5,
+                  ),
+                ),
+                const SizedBox(height: 3),
+                Text(
+                  'Signature Obsidian Executive • Penyimpanan Lokal Privat',
+                  style: TextStyle(
+                    color: Colors.white.withValues(alpha: 0.2),
+                    fontSize: 9.5,
+                  ),
+                ),
+              ],
             ),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 30),
         ],
       ),
     );

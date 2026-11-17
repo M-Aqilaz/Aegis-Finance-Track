@@ -6,6 +6,8 @@ import '../widgets/asset_dialogs.dart';
 import '../widgets/financial_rings_card.dart';
 import '../widgets/leak_analysis_card.dart';
 import '../widgets/quick_log_bottom_sheet.dart';
+import '../widgets/recent_transactions_card.dart';
+import '../widgets/smart_command_bar.dart';
 import '../widgets/titanium_card.dart';
 import '../widgets/transfer_dialog.dart';
 
@@ -40,6 +42,22 @@ class HomeScreen extends StatelessWidget {
         final dailyLimit = storageService.dailyExpenseLimit;
         final isDark = Theme.of(context).brightness == Brightness.dark;
 
+        // Freedom Runway & Safe Daily Spend
+        double totalRecentExpense = 0.0;
+        final recentEntries = storageService.entries.take(7).toList();
+        for (final e in recentEntries) {
+          totalRecentExpense += e.totalExpense;
+        }
+        final avgDailyBurn = recentEntries.isNotEmpty
+            ? (totalRecentExpense / recentEntries.length)
+            : 25000.0;
+        final runwayDays = cashBalance > 0 && avgDailyBurn > 0
+            ? (cashBalance / avgDailyBurn)
+            : 0.0;
+        final lastDayOfMonth = DateTime(now.year, now.month + 1, 0).day;
+        final daysRemaining = (lastDayOfMonth - now.day).clamp(1, 31);
+        final safeDailySpend = cashBalance > 0 ? (cashBalance / daysRemaining) : 0.0;
+
         return Scaffold(
           backgroundColor: isDark ? AppTheme.obsidianBg : Theme.of(context).scaffoldBackgroundColor,
           body: CustomScrollView(
@@ -54,30 +72,23 @@ class HomeScreen extends StatelessWidget {
                 toolbarHeight: 70,
                 title: Row(
                   children: [
-                    // FinTrack Mascot Phoenix Emblem
+                    // Clean Vault Shield Logomark
                     Container(
-                      width: 38,
-                      height: 38,
+                      width: 36,
+                      height: 36,
                       decoration: BoxDecoration(
+                        color: AppTheme.surfaceCardElevated,
                         shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: AppTheme.cyberMint.withValues(alpha: 0.35),
-                            blurRadius: 12,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
+                        border: Border.all(
+                          color: AppTheme.cyberMint.withValues(alpha: 0.3),
+                          width: 1,
+                        ),
                       ),
-                      child: ClipOval(
-                        child: Image.asset(
-                          'assets/icon/fintrack_mascot.png',
-                          width: 38,
-                          height: 38,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) => Container(
-                            color: AppTheme.surfaceCardElevated,
-                            child: const Icon(Icons.diamond_rounded, color: AppTheme.cyberMint, size: 20),
-                          ),
+                      child: const Center(
+                        child: Icon(
+                          Icons.shield_outlined,
+                          size: 18,
+                          color: AppTheme.cyberMint,
                         ),
                       ),
                     ),
@@ -92,22 +103,22 @@ class HomeScreen extends StatelessWidget {
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(
-                              fontSize: 16,
+                              fontSize: 15.5,
                               fontWeight: FontWeight.w900,
-                              letterSpacing: 1.0,
+                              letterSpacing: 0.8,
                               color: Colors.white,
                             ),
                           ),
                           SizedBox(height: 1),
                           Text(
-                            'Smart Wealth Guardian',
+                            'Buku Kas & Portofolio',
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(
-                              fontSize: 10.5,
+                              fontSize: 10,
                               fontWeight: FontWeight.w600,
                               color: AppTheme.cyberMint,
-                              letterSpacing: 0.4,
+                              letterSpacing: 0.3,
                             ),
                           ),
                         ],
@@ -116,18 +127,18 @@ class HomeScreen extends StatelessWidget {
                   ],
                 ),
                 actions: [
-                  // Micro Streak Fire Pill (Non-intrusive & glanceable)
+                  // Clean Streak Badge
                   Container(
                     margin: const EdgeInsets.symmetric(vertical: 18),
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
                     decoration: BoxDecoration(
                       color: streakInfo.isRecordedToday
-                          ? AppTheme.solarAmber.withValues(alpha: 0.15)
-                          : Colors.white.withValues(alpha: 0.06),
-                      borderRadius: BorderRadius.circular(16),
+                          ? AppTheme.solarAmber.withValues(alpha: 0.12)
+                          : Colors.white.withValues(alpha: 0.05),
+                      borderRadius: BorderRadius.circular(12),
                       border: Border.all(
                         color: streakInfo.isRecordedToday
-                            ? AppTheme.solarAmber.withValues(alpha: 0.5)
+                            ? AppTheme.solarAmber.withValues(alpha: 0.4)
                             : Colors.white12,
                       ),
                     ),
@@ -136,14 +147,14 @@ class HomeScreen extends StatelessWidget {
                       children: [
                         Icon(
                           Icons.local_fire_department_rounded,
-                          size: 14,
+                          size: 13,
                           color: streakInfo.isRecordedToday ? AppTheme.solarAmber : Colors.white38,
                         ),
                         const SizedBox(width: 4),
                         Text(
                           '${streakInfo.displayStreak} Hari',
                           style: TextStyle(
-                            fontSize: 11,
+                            fontSize: 10.5,
                             fontWeight: FontWeight.w800,
                             color: streakInfo.isRecordedToday ? AppTheme.solarAmber : Colors.white60,
                           ),
@@ -158,18 +169,17 @@ class HomeScreen extends StatelessWidget {
                       padding: const EdgeInsets.all(7),
                       decoration: BoxDecoration(
                         color: AppTheme.surfaceCardElevated,
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(10),
                         border: Border.all(
                           color: privacyMode ? AppTheme.solarAmber.withValues(alpha: 0.5) : AppTheme.borderLight,
                         ),
                       ),
                       child: Icon(
                         privacyMode ? Icons.visibility_off_rounded : Icons.visibility_rounded,
-                        size: 20,
+                        size: 18,
                         color: privacyMode ? AppTheme.solarAmber : Colors.white70,
                       ),
                     ),
-                    tooltip: privacyMode ? 'Tampilkan Saldo' : 'Sembunyikan Saldo (Privasi)',
                     onPressed: storageService.togglePrivacyMode,
                   ),
                   const SizedBox(width: 8),
@@ -181,20 +191,27 @@ class HomeScreen extends StatelessWidget {
                   padding: const EdgeInsets.fromLTRB(16, 4, 16, 16),
                   child: Column(
                     children: [
-                      // 1. The Signature Black Titanium VIP Card (Net Worth First!)
+                      // 1. The Signature Executive Net Worth Card
                       TitaniumCard(
                         totalAllAssets: totalAllAssets,
                         cashBalance: cashBalance,
                         savingsBalance: savingsBalance,
                         otherAssetsBalance: otherAssetsSum,
                         privacyMode: privacyMode,
-                        onTogglePrivacy: storageService.togglePrivacyMode,
+                        runwayDays: runwayDays,
+                        safeDailySpend: safeDailySpend,
+                        onQuickLog: () => QuickLogBottomSheet.show(context, storageService: storageService),
                         onTransfer: () => TransferDialog.show(
                           context,
                           storageService: storageService,
                           initialFromPocketId: StorageService.kPocketSavingsId,
                         ),
                       ),
+
+                      const SizedBox(height: 12),
+
+                      // 2. One-Liner Smart Command Bar (Conversational Quick Log)
+                      SmartCommandBar(storageService: storageService),
 
                       const SizedBox(height: 22),
 
@@ -387,9 +404,44 @@ class HomeScreen extends StatelessWidget {
                         onTap: () => QuickLogBottomSheet.show(context, storageService: storageService),
                       ),
 
-                      const SizedBox(height: 18),
+                      const SizedBox(height: 22),
 
-                      // 4. Leak Analysis (expense pattern detector)
+                      // 4. Transaksi Terbaru (Recent Activity Feed)
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            'TRANSAKSI TERBARU',
+                            style: TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: 1.2,
+                              color: Colors.white54,
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: () => onNavigateTab(2),
+                            child: const Text(
+                              'Lihat Semua ›',
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                                color: AppTheme.cyberMint,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 10),
+
+                      RecentTransactionsCard(
+                        storageService: storageService,
+                        onViewAll: () => onNavigateTab(2),
+                      ),
+
+                      const SizedBox(height: 22),
+
+                      // 5. Leak Analysis (expense pattern detector)
                       if (storageService.entries.isNotEmpty) ...[
                         const Align(
                           alignment: Alignment.centerLeft,
@@ -408,51 +460,7 @@ class HomeScreen extends StatelessWidget {
                         const SizedBox(height: 18),
                       ],
 
-                      // 5. Prominent Integrated Quick Log Action Button
-                      InkWell(
-                        onTap: () => QuickLogBottomSheet.show(context, storageService: storageService),
-                        borderRadius: BorderRadius.circular(16),
-                        child: Container(
-                          width: double.infinity,
-                          padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
-                          decoration: BoxDecoration(
-                            gradient: const LinearGradient(
-                              colors: [
-                                AppTheme.cyberMint,
-                                Color(0xFF059669),
-                              ],
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                            ),
-                            borderRadius: BorderRadius.circular(16),
-                            boxShadow: [
-                              BoxShadow(
-                                color: AppTheme.cyberMint.withValues(alpha: 0.35),
-                                blurRadius: 16,
-                                offset: const Offset(0, 4),
-                              ),
-                            ],
-                          ),
-                          child: const Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(Icons.bolt_rounded, size: 22, color: Colors.black87),
-                              SizedBox(width: 8),
-                              Text(
-                                'Catat Transaksi (3 Detik)',
-                                style: TextStyle(
-                                    fontSize: 14.5,
-                                    fontWeight: FontWeight.w900,
-                                    color: Colors.black87,
-                                    letterSpacing: 0.2,
-                                  ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-
-                      const SizedBox(height: 120),
+                      const SizedBox(height: 100),
                     ],
                   ),
                 ),
@@ -476,82 +484,69 @@ class HomeScreen extends StatelessWidget {
   }) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(18),
+      borderRadius: BorderRadius.circular(16),
       child: Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          gradient: gradient,
-          borderRadius: BorderRadius.circular(18),
+          color: AppTheme.surfaceCard,
+          borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: Colors.white.withValues(alpha: 0.25),
+            color: Colors.white.withValues(alpha: 0.1),
             width: 1,
           ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.4),
-              blurRadius: 12,
-              offset: const Offset(0, 5),
-            ),
-          ],
         ),
-        child: Stack(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            // Watermark icon
-            Positioned(
-              right: -8,
-              bottom: -8,
-              child: Opacity(
-                opacity: 0.18,
-                child: Icon(icon, size: 50, color: Colors.white),
-              ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(6),
+                  decoration: BoxDecoration(
+                    gradient: gradient,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Icon(icon, size: 14, color: Colors.white),
+                ),
+                Text(
+                  subtitle,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 8.5,
+                    fontWeight: FontWeight.w800,
+                    color: Colors.white54,
+                    letterSpacing: 0.6,
+                  ),
+                ),
+              ],
             ),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      subtitle,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        fontSize: 8,
-                        fontWeight: FontWeight.w900,
-                        color: Colors.white.withValues(alpha: 0.75),
-                        letterSpacing: 0.8,
-                      ),
-                    ),
-                    const Icon(Icons.arrow_forward_ios_rounded, size: 9, color: Colors.white70),
-                  ],
+                Text(
+                  title,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white70,
+                  ),
                 ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      title,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      privacyMode ? 'Rp •••' : CurrencyFormatter.formatShort(amount),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w900,
-                        color: Colors.white,
-                        letterSpacing: -0.4,
-                      ),
-                    ),
-                  ],
+                const SizedBox(height: 2),
+                Text(
+                  privacyMode ? 'Rp •••' : CurrencyFormatter.formatShort(amount),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontSize: 15.5,
+                    fontWeight: FontWeight.w900,
+                    color: Colors.white,
+                    letterSpacing: -0.3,
+                  ),
                 ),
               ],
             ),

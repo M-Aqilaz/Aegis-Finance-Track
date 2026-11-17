@@ -134,6 +134,7 @@ class NotificationService {
     String title = '⏰ Catat Financial Track Hari Ini!',
     String body = 'Yuk rekap pemasukan, pengeluaran & tabungan hari ini agar tidak bocor!',
   }) async {
+    if (kIsWeb) return;
     try {
       // Cancel previous reminder first
       await cancelReminder(101);

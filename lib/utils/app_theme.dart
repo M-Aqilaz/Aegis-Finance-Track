@@ -135,51 +135,5 @@ class AppTheme {
     );
   }
 
-  static ThemeData get lightTheme {
-    return ThemeData(
-      useMaterial3: true,
-      brightness: Brightness.light,
-      colorSchemeSeed: const Color(0xFF00C47C), // Slightly deeper mint for light
-      scaffoldBackgroundColor: const Color(0xFFF0F4F8),
-      appBarTheme: const AppBarTheme(
-        backgroundColor: Color(0xFFF0F4F8),
-        elevation: 0,
-        centerTitle: false,
-        scrolledUnderElevation: 0,
-        titleTextStyle: TextStyle(
-          color: Color(0xFF0F172A),
-          fontSize: 20,
-          fontWeight: FontWeight.w800,
-          letterSpacing: -0.5,
-        ),
-        iconTheme: IconThemeData(color: Color(0xFF0F172A)),
-      ),
-      inputDecorationTheme: InputDecorationTheme(
-        filled: true,
-        fillColor: Colors.white,
-        labelStyle: const TextStyle(color: Color(0xFF64748B)),
-        hintStyle: const TextStyle(color: Color(0xFF94A3B8)),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: Color(0xFFCBD5E1)),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: Color(0xFFCBD5E1)),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: Color(0xFF00C47C), width: 1.5),
-        ),
-      ),
-      cardTheme: const CardThemeData(
-        elevation: 0,
-        color: Colors.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(20)),
-          side: BorderSide(color: Color(0xFFE2E8F0)),
-        ),
-      ),
-    );
-  }
+  static ThemeData get lightTheme => darkTheme;
 }

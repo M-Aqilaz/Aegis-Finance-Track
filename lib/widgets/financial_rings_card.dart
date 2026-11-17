@@ -97,18 +97,19 @@ class FinancialRingsCard extends StatelessWidget {
                           ring3Progress: saveProgress,
                         ),
                       ),
-                      // Mascot Avatar in the Center of Rings
-                      ClipOval(
-                        child: Image.asset(
-                          'assets/icon/fintrack_mascot.png',
-                          width: 34,
-                          height: 34,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) => const Icon(
-                            Icons.local_fire_department_rounded,
-                            size: 22,
-                            color: AppTheme.solarAmber,
-                          ),
+                      // Clean Center Emblem
+                      Container(
+                        width: 32,
+                        height: 32,
+                        decoration: BoxDecoration(
+                          color: AppTheme.obsidianBg,
+                          shape: BoxShape.circle,
+                          border: Border.all(color: Colors.white12),
+                        ),
+                        child: const Icon(
+                          Icons.donut_large_rounded,
+                          size: 16,
+                          color: AppTheme.cyberMint,
                         ),
                       ),
                     ],

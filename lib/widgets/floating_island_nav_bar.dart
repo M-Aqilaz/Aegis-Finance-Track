@@ -51,14 +51,9 @@ class FloatingIslandNavBar extends StatelessWidget {
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.6),
-              blurRadius: 28,
-              offset: const Offset(0, 10),
-            ),
-            BoxShadow(
-              color: AppTheme.cyberMint.withValues(alpha: 0.06),
-              blurRadius: 18,
-              spreadRadius: 1,
+              color: Colors.black.withValues(alpha: 0.45),
+              blurRadius: 20,
+              offset: const Offset(0, 8),
             ),
           ],
         ),

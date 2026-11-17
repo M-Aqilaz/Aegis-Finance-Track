@@ -70,10 +70,28 @@ class LeakAnalysisCard extends StatelessWidget {
             const SizedBox(height: 10),
           ],
 
-          // Warnings
-          if (analysis.warnings.isNotEmpty) ...[
-            ...analysis.warnings.map((w) => _buildWarningChip(w)),
-          ],
+          // Warnings or Clean Status
+          if (analysis.warnings.isNotEmpty)
+            ...analysis.warnings.map((w) => _buildWarningChip(w))
+          else
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.03),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.white.withValues(alpha: 0.06)),
+              ),
+              child: const Row(
+                children: [
+                  Icon(Icons.shield_outlined, size: 13, color: AppTheme.cyberMint),
+                  SizedBox(width: 6),
+                  Text(
+                    'Arus Kas Sehat • Tidak terdeteksi kebocoran kritis',
+                    style: TextStyle(fontSize: 10, color: Colors.white60, fontWeight: FontWeight.w600),
+                  ),
+                ],
+              ),
+            ),
         ],
       ),
     );
@@ -202,26 +220,24 @@ class LeakAnalysisCard extends StatelessWidget {
   Widget _buildWarningChip(LeakWarning w) {
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.all(10),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
         color: w.color.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: w.color.withValues(alpha: 0.25)),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: w.color.withValues(alpha: 0.25), width: 0.8),
       ),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Icon(w.icon, color: w.color, size: 18),
+          Icon(w.icon, color: w.color, size: 16),
           const SizedBox(width: 8),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(w.title, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: w.color)),
+                Text(w.title, style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: w.color)),
                 const SizedBox(height: 2),
-                Text(w.message, style: const TextStyle(fontSize: 10, color: Colors.white60)),
-                const SizedBox(height: 3),
-                Text('💡 ${w.recommendation}', style: const TextStyle(fontSize: 10, color: Colors.white38, fontStyle: FontStyle.italic)),
+                Text(w.message, style: const TextStyle(fontSize: 10, color: Colors.white70)),
               ],
             ),
           ),
