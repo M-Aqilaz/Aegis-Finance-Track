@@ -11,9 +11,9 @@ void main() async {
   // Initialize Indonesian date formatting
   await initializeDateFormatting('id_ID', null);
 
-  // Initialize services
+  // Initialize services (Start with clean slate / 0 balance for new users)
   final storageService = StorageService();
-  await storageService.init(loadSampleDataIfEmpty: true);
+  await storageService.init(loadSampleDataIfEmpty: false);
 
   final notificationService = NotificationService();
   await notificationService.init();

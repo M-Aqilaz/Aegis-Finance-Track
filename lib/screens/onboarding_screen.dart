@@ -23,7 +23,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           'Pantau akumulasi seluruh kekayaan (Net Worth), kas operasional harian, dan brankas tabungan dalam satu tampilan eksekutif tanpa distraksi.',
       icon: Icons.account_balance_wallet_rounded,
       color: AppTheme.cyberMint,
-      imageAsset: 'assets/icon/fintrack_mascot.png',
+      imageAsset: 'assets/icon/app_icon.png',
     ),
     _OnboardingItem(
       badge: '100% OFFLINE-FIRST & PRIVATE',
@@ -69,15 +69,21 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   Row(
                     children: [
                       Container(
-                        padding: const EdgeInsets.all(6),
+                        width: 28,
+                        height: 28,
                         decoration: BoxDecoration(
-                          color: AppTheme.cyberMint.withValues(alpha: 0.15),
-                          shape: BoxShape.circle,
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
+                            color: AppTheme.cyberMint.withValues(alpha: 0.4),
+                            width: 1,
+                          ),
                         ),
-                        child: const Icon(
-                          Icons.shield_rounded,
-                          size: 16,
-                          color: AppTheme.cyberMint,
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(7),
+                          child: Image.asset(
+                            'assets/icon/app_icon.png',
+                            fit: BoxFit.cover,
+                          ),
                         ),
                       ),
                       const SizedBox(width: 8),

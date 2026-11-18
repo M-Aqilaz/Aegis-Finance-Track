@@ -3,9 +3,29 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 import '../models/asset_account.dart';
+import '../models/impulse_item.dart';
 import '../models/pocket_transfer.dart';
+import '../models/savings_goal.dart';
 import '../models/streak_info.dart';
 import '../models/transaction_entry.dart';
+
+class DailySafeSpendMetrics {
+  final double safeQuota;
+  final double spentToday;
+  final double remainingQuota;
+  final double percentUsed;
+  final int daysLeftInCycle;
+  final String cycleLabel;
+
+  const DailySafeSpendMetrics({
+    required this.safeQuota,
+    required this.spentToday,
+    required this.remainingQuota,
+    required this.percentUsed,
+    required this.daysLeftInCycle,
+    required this.cycleLabel,
+  });
+}
 
 class PocketOption {
   final String id;
@@ -44,16 +64,25 @@ class StorageService extends ChangeNotifier {
   static const String _kPinCodeKey = 'pref_pin_code';
   // _kBiometricsEnabledKey removed — biometric feature not implemented
   static const String _kHasSeenOnboardingKey = 'pref_has_seen_onboarding';
+  static const String _kCycleTypeKey = 'pref_cycle_type_v2';
+  static const String _kRefillDayKey = 'pref_refill_day_v2';
+  static const String _kImpulseItemsKey = 'pref_impulse_items_v2';
+  static const String _kSavingsGoalsKey = 'pref_savings_goals_v2';
 
   final List<DayEntry> _entries = [];
   final List<AssetAccount> _customAssets = [];
   final List<PocketTransfer> _transfers = [];
+  final List<ImpulseItem> _impulseItems = [];
+  final List<SavingsGoal> _savingsGoals = [];
   bool _isLoaded = false;
   bool _privacyMode = false;
   bool _pinEnabled = false;
   String _pinCode = '';
   bool _isAppLocked = false;
   bool _hasSeenOnboarding = false;
+
+  String _cycleType = 'monthly'; // 'monthly', 'weekly', 'free'
+  int _refillDay = 1; // 1st of month, or 1 = Monday
 
   bool _reminderEnabled = true;
   int _reminderHour = 20; // 20:00 / 8 PM
@@ -66,6 +95,12 @@ class StorageService extends ChangeNotifier {
   List<DayEntry> get entries => List.unmodifiable(_entries);
   List<AssetAccount> get customAssets => List.unmodifiable(_customAssets);
   List<PocketTransfer> get transfers => List.unmodifiable(_transfers);
+  List<ImpulseItem> get impulseItems => List.unmodifiable(_impulseItems);
+  List<ImpulseItem> get pendingImpulseItems =>
+      _impulseItems.where((i) => i.status == 'pending').toList();
+  List<SavingsGoal> get savingsGoals => List.unmodifiable(_savingsGoals);
+  String get cycleType => _cycleType;
+  int get refillDay => _refillDay;
   bool get isLoaded => _isLoaded;
   bool get privacyMode => _privacyMode;
   bool get pinEnabled => _pinEnabled;
@@ -240,8 +275,38 @@ class StorageService extends ChangeNotifier {
     _pinEnabled = prefs.getBool(_kPinEnabledKey) ?? false;
     _pinCode = prefs.getString(_kPinCodeKey) ?? '';
     _hasSeenOnboarding = prefs.getBool(_kHasSeenOnboardingKey) ?? false;
+    _cycleType = prefs.getString(_kCycleTypeKey) ?? 'monthly';
+    _refillDay = prefs.getInt(_kRefillDayKey) ?? 1;
     if (_pinEnabled && _pinCode.isNotEmpty) {
       _isAppLocked = true;
+    }
+
+    // Load impulse items
+    final impulseJson = prefs.getString(_kImpulseItemsKey);
+    if (impulseJson != null && impulseJson.isNotEmpty) {
+      try {
+        final List<dynamic> decodedImpulse = jsonDecode(impulseJson);
+        _impulseItems.clear();
+        for (var item in decodedImpulse) {
+          _impulseItems.add(ImpulseItem.fromJson(item as Map<String, dynamic>));
+        }
+      } catch (e) {
+        debugPrint('Failed to decode impulse items: $e');
+      }
+    }
+
+    // Load savings goals
+    final goalsJson = prefs.getString(_kSavingsGoalsKey);
+    if (goalsJson != null && goalsJson.isNotEmpty) {
+      try {
+        final List<dynamic> decodedGoals = jsonDecode(goalsJson);
+        _savingsGoals.clear();
+        for (var item in decodedGoals) {
+          _savingsGoals.add(SavingsGoal.fromJson(item as Map<String, dynamic>));
+        }
+      } catch (e) {
+        debugPrint('Failed to decode savings goals: $e');
+      }
     }
 
     // Load transfers
@@ -742,6 +807,44 @@ class StorageService extends ChangeNotifier {
     await prefs.setString(_kTransfersKey, jsonEncode(jsonList));
   }
 
+  /// Reset all data to 0 (Clean Slate for fresh app start)
+  Future<void> resetToCleanSlate() async {
+    _entries.clear();
+    _recalculateBalances();
+    await _saveEntriesToPrefs();
+
+    _transfers.clear();
+    await _saveTransfersToPrefs();
+
+    _impulseItems.clear();
+    await _saveImpulseItemsToPrefs();
+
+    _savingsGoals.clear();
+    await _saveSavingsGoalsToPrefs();
+
+    _customAssets.clear();
+    _customAssets.add(AssetAccount(
+      id: 'asset-seabank',
+      name: 'SeaBank',
+      balance: 0.0,
+      colorValue: 0xFFF97316,
+      iconName: 'account_balance',
+    ));
+    _customAssets.add(AssetAccount(
+      id: 'asset-bank-jago',
+      name: 'Bank Jago',
+      balance: 0.0,
+      colorValue: 0xFF8B5CF6,
+      iconName: 'account_balance_wallet',
+    ));
+    await _saveCustomAssetsToPrefs();
+
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt(_kSeedVersionKey, _kCurrentSeedVersion);
+
+    notifyListeners();
+  }
+
   /// Reset to initial user sample data
   Future<void> resetToDefault() async {
     _loadSeedData();
@@ -767,6 +870,18 @@ class StorageService extends ChangeNotifier {
 
     _transfers.clear();
     await _saveTransfersToPrefs();
+
+    _savingsGoals.clear();
+    _savingsGoals.add(SavingsGoal(
+      id: 'goal-sample-1',
+      title: 'Laptop Kerja & Skripsi',
+      targetAmount: 5000000,
+      currentAmount: 2500000,
+      colorHex: 0xFF00F59B,
+      iconName: 'laptop_mac',
+      createdAt: DateTime(2026, 11, 1),
+    ));
+    await _saveSavingsGoalsToPrefs();
 
     notifyListeners();
   }
@@ -833,5 +948,313 @@ class StorageService extends ChangeNotifier {
       debugPrint('Import error: $e');
       return false;
     }
+  }
+
+  // ==========================================
+  // UNIVERSAL DEFENSE: IMPULSE & CYCLE METHODS
+  // ==========================================
+
+  Future<void> _saveImpulseItemsToPrefs() async {
+    final prefs = await SharedPreferences.getInstance();
+    final jsonStr = jsonEncode(_impulseItems.map((e) => e.toJson()).toList());
+    await prefs.setString(_kImpulseItemsKey, jsonStr);
+  }
+
+  Future<void> addImpulseItem(ImpulseItem item) async {
+    _impulseItems.insert(0, item);
+    await _saveImpulseItemsToPrefs();
+    notifyListeners();
+  }
+
+  Future<void> updateImpulseItem(ImpulseItem item) async {
+    final idx = _impulseItems.indexWhere((i) => i.id == item.id);
+    if (idx != -1) {
+      _impulseItems[idx] = item;
+      await _saveImpulseItemsToPrefs();
+      notifyListeners();
+    }
+  }
+
+  Future<void> deleteImpulseItem(String id) async {
+    _impulseItems.removeWhere((i) => i.id == id);
+    await _saveImpulseItemsToPrefs();
+    notifyListeners();
+  }
+
+  /// Diverts quarantined impulse to savings! Boosts savings balance.
+  Future<void> divertImpulseToSavings(ImpulseItem item) async {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final existing = getEntryByDate(today);
+
+    if (existing != null) {
+      final updated = existing.copyWith(saveAmount: existing.saveAmount + item.amount);
+      await saveOrUpdateEntry(updated);
+    } else {
+      final newEntry = DayEntry(
+        id: const Uuid().v4(),
+        date: today,
+        income: 0.0,
+        saveAmount: item.amount,
+        directExpense: 0.0,
+        expenses: [],
+      );
+      await saveOrUpdateEntry(newEntry);
+    }
+
+    await updateImpulseItem(item.copyWith(status: 'saved'));
+  }
+
+  /// Claims quarantined impulse as purchase: creates real logged expense on today's entry!
+  Future<void> claimImpulseAsPurchase(ImpulseItem item) async {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final existing = getEntryByDate(today);
+
+    ExpenseCategory category = ExpenseCategory.lainnya;
+    for (var cat in ExpenseCategory.values) {
+      if (cat.name.toLowerCase() == item.category.toLowerCase() ||
+          cat.displayName.toLowerCase().contains(item.category.toLowerCase())) {
+        category = cat;
+        break;
+      }
+    }
+
+    final newItem = ExpenseItem(
+      id: const Uuid().v4(),
+      title: item.title,
+      amount: item.amount,
+      category: category,
+      note: 'Dibeli setelah karantina 48 jam',
+    );
+
+    if (existing != null) {
+      final updatedExpenses = List<ExpenseItem>.from(existing.expenses)..add(newItem);
+      final updated = existing.copyWith(expenses: updatedExpenses);
+      await saveOrUpdateEntry(updated);
+    } else {
+      final newEntry = DayEntry(
+        id: const Uuid().v4(),
+        date: today,
+        income: 0.0,
+        saveAmount: 0.0,
+        directExpense: item.amount,
+        expenses: [newItem],
+      );
+      await saveOrUpdateEntry(newEntry);
+    }
+
+    await updateImpulseItem(item.copyWith(status: 'purchased'));
+  }
+
+  Future<void> setCycleConfiguration({
+    required String cycleType,
+    required int refillDay,
+  }) async {
+    _cycleType = cycleType;
+    _refillDay = refillDay;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_kCycleTypeKey, cycleType);
+    await prefs.setInt(_kRefillDayKey, refillDay);
+    notifyListeners();
+  }
+
+  /// Average daily burn rate across recent entries
+  double get averageDailyBurn {
+    if (_entries.isEmpty) return _dailyExpenseLimit > 0 ? _dailyExpenseLimit : 35000.0;
+    final recent = _entries.reversed.take(14).toList();
+    double sumExp = 0.0;
+    int count = 0;
+    for (final e in recent) {
+      if (e.totalExpense > 0) {
+        sumExp += e.totalExpense;
+        count++;
+      }
+    }
+    if (count == 0) return _dailyExpenseLimit > 0 ? _dailyExpenseLimit : 35000.0;
+    final avg = sumExp / count;
+    return avg > 1000 ? avg : 35000.0;
+  }
+
+  /// Calculates equivalent days of survival / daily allowance for a given amount
+  double calculateLifeDaysEquivalent(double amount) {
+    final burn = averageDailyBurn;
+    if (burn <= 0) return 0.0;
+    return amount / burn;
+  }
+
+  /// Deterministic universal safe spending metrics
+  DailySafeSpendMetrics getDailySafeSpendingMetrics() {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final todayEntry = getEntryByDate(today);
+    final spentToday = todayEntry?.totalExpense ?? 0.0;
+
+    int daysLeft = 1;
+    String label = '';
+
+    if (_cycleType == 'weekly') {
+      final currentWeekday = now.weekday;
+      final target = _refillDay.clamp(1, 7);
+      if (currentWeekday == target) {
+        daysLeft = 7;
+      } else if (currentWeekday < target) {
+        daysLeft = target - currentWeekday;
+      } else {
+        daysLeft = 7 - (currentWeekday - target);
+      }
+      const dayNames = ['', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'];
+      label = 'Mingguan (Refill ${dayNames[target]})';
+    } else if (_cycleType == 'monthly') {
+      final targetDay = _refillDay.clamp(1, 31);
+      if (now.day < targetDay) {
+        daysLeft = targetDay - now.day;
+      } else {
+        final nextMonth = DateTime(now.year, now.month + 1, targetDay);
+        daysLeft = nextMonth.difference(today).inDays;
+      }
+      daysLeft = daysLeft.clamp(1, 31);
+      label = 'Bulanan (Refill tgl $targetDay)';
+    } else {
+      final totalAssets = totalAllAssets;
+      final burn = averageDailyBurn;
+      daysLeft = burn > 0 ? (totalAssets / burn).ceil() : 30;
+      if (daysLeft < 1) daysLeft = 1;
+      label = 'Siklus Bebas / Runway';
+    }
+
+    final availableLiquid = totalAllAssets;
+    final safeQuota = daysLeft > 0 ? (availableLiquid / daysLeft) : _dailyExpenseLimit;
+    final remainingQuota = safeQuota - spentToday;
+    final percentUsed = safeQuota > 0 ? (spentToday / safeQuota) : 0.0;
+
+    return DailySafeSpendMetrics(
+      safeQuota: safeQuota,
+      spentToday: spentToday,
+      remainingQuota: remainingQuota,
+      percentUsed: percentUsed,
+      daysLeftInCycle: daysLeft,
+      cycleLabel: label,
+    );
+  }
+
+  // ==========================================
+  // SAVINGS GOAL VAULT (KANTONG IMPIAN) METHODS
+  // ==========================================
+
+  Future<void> _saveSavingsGoalsToPrefs() async {
+    final prefs = await SharedPreferences.getInstance();
+    final jsonStr = jsonEncode(_savingsGoals.map((g) => g.toJson()).toList());
+    await prefs.setString(_kSavingsGoalsKey, jsonStr);
+  }
+
+  Future<void> addSavingsGoal(SavingsGoal goal) async {
+    _savingsGoals.add(goal);
+    await _saveSavingsGoalsToPrefs();
+    notifyListeners();
+  }
+
+  Future<void> updateSavingsGoal(SavingsGoal goal) async {
+    final idx = _savingsGoals.indexWhere((g) => g.id == goal.id);
+    if (idx != -1) {
+      _savingsGoals[idx] = goal;
+      await _saveSavingsGoalsToPrefs();
+      notifyListeners();
+    }
+  }
+
+  Future<void> deleteSavingsGoal(String id) async {
+    _savingsGoals.removeWhere((g) => g.id == id);
+    await _saveSavingsGoalsToPrefs();
+    notifyListeners();
+  }
+
+  /// Deposit money into a savings goal from a specific pocket
+  Future<bool> depositToSavingsGoal({
+    required String goalId,
+    required double amount,
+    required String fromPocketId,
+  }) async {
+    if (amount <= 0) return false;
+    final goalIdx = _savingsGoals.indexWhere((g) => g.id == goalId);
+    if (goalIdx == -1) return false;
+
+    // Deduct from pocket
+    if (fromPocketId == kPocketCashId) {
+      final now = DateTime.now();
+      final today = DateTime(now.year, now.month, now.day);
+      final existing = getEntryByDate(today);
+      final entry = (existing != null)
+          ? existing.copyWith(saveAmount: existing.saveAmount + amount)
+          : DayEntry(
+              id: const Uuid().v4(),
+              date: today,
+              saveAmount: amount,
+            );
+      await saveOrUpdateEntry(entry);
+    } else if (fromPocketId != kPocketSavingsId) {
+      final asset = _customAssets.where((a) => a.id == fromPocketId).firstOrNull;
+      if (asset != null) {
+        final newBal = (asset.balance - amount).clamp(0.0, double.infinity);
+        await updateAssetBalance(asset.id, newBal);
+      }
+    }
+
+    final goal = _savingsGoals[goalIdx];
+    _savingsGoals[goalIdx] = goal.copyWith(currentAmount: goal.currentAmount + amount);
+    await _saveSavingsGoalsToPrefs();
+    notifyListeners();
+    return true;
+  }
+
+  /// Withdraw money from a savings goal back to a specific pocket
+  Future<bool> withdrawFromSavingsGoal({
+    required String goalId,
+    required double amount,
+    required String toPocketId,
+  }) async {
+    if (amount <= 0) return false;
+    final goalIdx = _savingsGoals.indexWhere((g) => g.id == goalId);
+    if (goalIdx == -1) return false;
+
+    final goal = _savingsGoals[goalIdx];
+    if (goal.currentAmount < amount) return false;
+
+    _savingsGoals[goalIdx] = goal.copyWith(currentAmount: goal.currentAmount - amount);
+    await _saveSavingsGoalsToPrefs();
+
+    // Add back to destination pocket
+    if (toPocketId == kPocketCashId) {
+      final now = DateTime.now();
+      final today = DateTime(now.year, now.month, now.day);
+      final existing = getEntryByDate(today);
+      if (existing != null && existing.saveAmount >= amount) {
+        await saveOrUpdateEntry(existing.copyWith(saveAmount: existing.saveAmount - amount));
+      } else {
+        await saveOrUpdateEntry(DayEntry(
+          id: const Uuid().v4(),
+          date: today,
+          income: amount,
+          incomeNote: 'Tarik dari Kantong Impian (${goal.title})',
+        ));
+      }
+    } else if (toPocketId != kPocketSavingsId) {
+      final asset = _customAssets.where((a) => a.id == toPocketId).firstOrNull;
+      if (asset != null) {
+        await updateAssetBalance(asset.id, asset.balance + amount);
+      }
+    }
+
+    notifyListeners();
+    return true;
+  }
+
+  /// Calculates estimated days remaining to reach goal based on daily savings rate
+  int calculateDaysToReachGoal(SavingsGoal goal) {
+    if (goal.isCompleted) return 0;
+    final remaining = goal.remainingAmount;
+    final burn = averageDailyBurn;
+    final dailySavingRate = burn > 0 ? (burn * 0.35) : 20000.0;
+    return (remaining / dailySavingRate).ceil().clamp(1, 999);
   }
 }

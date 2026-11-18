@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
+import '../models/impulse_item.dart';
 import '../models/transaction_entry.dart';
 import '../screens/add_edit_entry_screen.dart';
 import '../services/storage_service.dart';
@@ -142,6 +143,40 @@ class _QuickLogBottomSheetState extends State<QuickLogBottomSheet> {
     }
   }
 
+  Future<void> _quarantine() async {
+    final amount = _amount;
+    if (amount <= 0) return;
+    final item = ImpulseItem(
+      id: const Uuid().v4(),
+      title: _selectedCategory.displayName,
+      amount: amount,
+      createdAt: DateTime.now(),
+      durationHours: 48,
+      category: _selectedCategory.displayName,
+    );
+    await widget.storageService.addImpulseItem(item);
+    if (mounted) {
+      Navigator.pop(context);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: const Color(0xFF6366F1),
+          content: Row(
+            children: [
+              const Icon(Icons.shield_rounded, color: Colors.white, size: 20),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  '🛡️ Berhasil ditahan 48 Jam di Kotak Pending! Anda mengamankan ${CurrencyFormatter.formatRp(amount)}.',
+                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -207,6 +242,33 @@ class _QuickLogBottomSheetState extends State<QuickLogBottomSheet> {
                 ],
               ),
             ),
+
+            if (_type == 'expense' && _amount > 0) ...[
+              const SizedBox(height: 8),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                decoration: BoxDecoration(
+                  color: AppTheme.solarAmber.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: AppTheme.solarAmber.withValues(alpha: 0.3)),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.bolt_rounded, size: 13, color: AppTheme.solarAmber),
+                    const SizedBox(width: 5),
+                    Text(
+                      'Setara ~${widget.storageService.calculateLifeDaysEquivalent(_amount).toStringAsFixed(1)} Hari Uang Saku / Jatah Hidup',
+                      style: const TextStyle(
+                        fontSize: 11.5,
+                        fontWeight: FontWeight.w700,
+                        color: AppTheme.solarAmber,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
 
             const SizedBox(height: 10),
 
@@ -296,31 +358,84 @@ class _QuickLogBottomSheetState extends State<QuickLogBottomSheet> {
 
             const SizedBox(height: 14),
 
-            // Submit Button
-            SizedBox(
-              width: double.infinity,
-              height: 50,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppTheme.cyberMint,
-                  foregroundColor: Colors.black87,
-                  elevation: 0,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                ),
-                onPressed: _submit,
-                child: const Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.bolt_rounded, size: 20, color: Colors.black87),
-                    SizedBox(width: 8),
-                    Text(
-                      'Simpan Instan (3 Detik)',
-                      style: TextStyle(fontSize: 15, fontWeight: FontWeight.w900),
+            // Submit / Quarantine Actions
+            if (_type == 'expense' && _amount > 0) ...[
+              Row(
+                children: [
+                  Expanded(
+                    flex: 4,
+                    child: SizedBox(
+                      height: 50,
+                      child: OutlinedButton.icon(
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: const Color(0xFF818CF8),
+                          side: const BorderSide(color: Color(0xFF6366F1), width: 1.2),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                        ),
+                        onPressed: _quarantine,
+                        icon: const Icon(Icons.shield_outlined, size: 16),
+                        label: const Text(
+                          'Tahan 48 Jam',
+                          style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.bold),
+                        ),
+                      ),
                     ),
-                  ],
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    flex: 5,
+                    child: SizedBox(
+                      height: 50,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppTheme.cyberMint,
+                          foregroundColor: Colors.black87,
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                        ),
+                        onPressed: _submit,
+                        child: const Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.bolt_rounded, size: 18, color: Colors.black87),
+                            SizedBox(width: 6),
+                            Text(
+                              'Simpan Instan',
+                              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ] else ...[
+              SizedBox(
+                width: double.infinity,
+                height: 50,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppTheme.cyberMint,
+                    foregroundColor: Colors.black87,
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  ),
+                  onPressed: _submit,
+                  child: const Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.bolt_rounded, size: 20, color: Colors.black87),
+                      SizedBox(width: 8),
+                      Text(
+                        'Simpan Instan (3 Detik)',
+                        style: TextStyle(fontSize: 15, fontWeight: FontWeight.w900),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
+            ],
 
             const SizedBox(height: 10),
 

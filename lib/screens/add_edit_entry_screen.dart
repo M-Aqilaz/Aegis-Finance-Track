@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
+import '../models/impulse_item.dart';
 import '../models/transaction_entry.dart';
 import '../services/storage_service.dart';
 import '../utils/app_theme.dart';
@@ -210,39 +211,83 @@ class _AddEditEntryScreenState extends State<AddEditEntryScreen> {
                     }).toList(),
                   ),
                   const SizedBox(height: 20),
-                  SizedBox(
-                    width: double.infinity,
-                    height: 48,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppTheme.cyberMint,
-                        foregroundColor: Colors.black87,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton.icon(
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: const Color(0xFF818CF8),
+                            side: const BorderSide(color: Color(0xFF6366F1), width: 1.2),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                          ),
+                          onPressed: () async {
+                            final title = titleController.text.trim();
+                            final amount = CurrencyFormatter.parseAmount(amountController.text);
+                            if (title.isEmpty || amount <= 0) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text('Masukkan nama dan nominal yang benar')),
+                              );
+                              return;
+                            }
+                            final item = ImpulseItem(
+                              id: const Uuid().v4(),
+                              title: title,
+                              amount: amount,
+                              createdAt: DateTime.now(),
+                              durationHours: 48,
+                              category: selectedCat.displayName,
+                            );
+                            await widget.storageService.addImpulseItem(item);
+                            if (ctx.mounted) Navigator.pop(ctx);
+                            if (mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  backgroundColor: const Color(0xFF6366F1),
+                                  content: Text('🛡️ Ditahan 48 Jam di Kotak Pending: $title'),
+                                ),
+                              );
+                            }
+                          },
+                          icon: const Icon(Icons.shield_outlined, size: 16),
+                          label: const Text('Tahan 48 Jam', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12.5)),
+                        ),
                       ),
-                      onPressed: () {
-                        final title = titleController.text.trim();
-                        final amount = CurrencyFormatter.parseAmount(amountController.text);
-                        if (title.isEmpty || amount <= 0) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Masukkan nama dan nominal yang benar')),
-                          );
-                          return;
-                        }
-                        setState(() {
-                          _expenseItems.add(ExpenseItem(
-                            id: const Uuid().v4(),
-                            title: title,
-                            amount: amount,
-                            category: selectedCat,
-                          ));
-                          final sum = _expenseItems.fold(0.0, (s, i) => s + i.amount);
-                          _expenseController.text = sum.toInt().toString();
-                          _showItems = true;
-                        });
-                        Navigator.pop(ctx);
-                      },
-                      child: const Text('Simpan Item', style: TextStyle(fontWeight: FontWeight.bold)),
-                    ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppTheme.cyberMint,
+                            foregroundColor: Colors.black87,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                          ),
+                          onPressed: () {
+                            final title = titleController.text.trim();
+                            final amount = CurrencyFormatter.parseAmount(amountController.text);
+                            if (title.isEmpty || amount <= 0) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text('Masukkan nama dan nominal yang benar')),
+                              );
+                              return;
+                            }
+                            setState(() {
+                              _expenseItems.add(ExpenseItem(
+                                id: const Uuid().v4(),
+                                title: title,
+                                amount: amount,
+                                category: selectedCat,
+                              ));
+                              final sum = _expenseItems.fold(0.0, (s, i) => s + i.amount);
+                              _expenseController.text = sum.toInt().toString();
+                              _showItems = true;
+                            });
+                            Navigator.pop(ctx);
+                          },
+                          child: const Text('Simpan Item', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),

@@ -260,16 +260,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
                 const Divider(height: 1),
                 ListTile(
-                  leading: const Icon(Icons.restart_alt, color: Colors.orange),
-                  title: const Text('Reset Data ke Awal', style: TextStyle(color: Colors.orange)),
-                  subtitle: const Text('Kosongkan riwayat transaksi untuk mulai baru', style: TextStyle(fontSize: 12)),
+                  leading: const Icon(Icons.cleaning_services_rounded, color: Colors.orange),
+                  title: const Text('Reset Bersih ke Nol (Clean Slate)', style: TextStyle(color: Colors.orange)),
+                  subtitle: const Text('Kosongkan semua saldo menjadi Rp 0 untuk mulai dari awal', style: TextStyle(fontSize: 12)),
                   onTap: () {
                     showDialog(
                       context: context,
                       builder: (ctx) => AlertDialog(
-                        title: const Text('Reset Data Aplikasi?'),
+                        title: const Text('Reset Bersih ke Rp 0?'),
                         content: const Text(
-                          'Semua riwayat transaksi dan penyesuaian saldo akan diatur ulang ke kondisi awal default. Pastikan Anda telah membuat cadangan data jika diperlukan.',
+                          'Semua saldo (Kas, Tabungan, Bank) akan di-reset menjadi Rp 0 dan riwayat transaksi akan dikosongkan bersih. Gunakan ini jika ingin mulai mencatat dari awal.',
                         ),
                         actions: [
                           TextButton(
@@ -283,15 +283,55 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             ),
                             onPressed: () async {
                               final messenger = ScaffoldMessenger.of(context);
+                              await widget.storageService.resetToCleanSlate();
+                              if (ctx.mounted) Navigator.pop(ctx);
+                              if (mounted) {
+                                messenger.showSnackBar(
+                                  const SnackBar(content: Text('Aplikasi berhasil di-reset bersih ke Rp 0.')),
+                                );
+                              }
+                            },
+                            child: const Text('Reset ke Rp 0'),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
+                const Divider(height: 1),
+                ListTile(
+                  leading: const Icon(Icons.dataset_outlined, color: AppTheme.cyberMint),
+                  title: const Text('Muat Data Contoh / Demo', style: TextStyle(color: Colors.white70)),
+                  subtitle: const Text('Isi data simulasi 8 hari untuk melihat fitur grafik dan portofolio', style: TextStyle(fontSize: 12)),
+                  onTap: () {
+                    showDialog(
+                      context: context,
+                      builder: (ctx) => AlertDialog(
+                        title: const Text('Muat Data Simulasi?'),
+                        content: const Text(
+                          'Data simulasi contoh (Kas, Tabungan, SeaBank, Bank Jago) akan dimuat untuk melihat tampilan penuh aplikasi.',
+                        ),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(ctx),
+                            child: const Text('Batal'),
+                          ),
+                          ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppTheme.cyberMint,
+                              foregroundColor: Colors.black87,
+                            ),
+                            onPressed: () async {
+                              final messenger = ScaffoldMessenger.of(context);
                               await widget.storageService.resetToDefault();
                               if (ctx.mounted) Navigator.pop(ctx);
                               if (mounted) {
                                 messenger.showSnackBar(
-                                  const SnackBar(content: Text('Data aplikasi berhasil di-reset ke kondisi awal default.')),
+                                  const SnackBar(content: Text('Data simulasi contoh berhasil dimuat.')),
                                 );
                               }
                             },
-                            child: const Text('Reset Sekarang'),
+                            child: const Text('Muat Simulasi'),
                           ),
                         ],
                       ),
@@ -307,7 +347,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             child: Column(
               children: [
                 Text(
-                  'Aegis Finance v2.4',
+                  'Aegis Finance v1.4.0',
                   style: TextStyle(
                     color: Colors.white.withValues(alpha: 0.35),
                     fontSize: 11,

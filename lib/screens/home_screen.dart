@@ -7,9 +7,11 @@ import '../widgets/financial_rings_card.dart';
 import '../widgets/leak_analysis_card.dart';
 import '../widgets/quick_log_bottom_sheet.dart';
 import '../widgets/recent_transactions_card.dart';
+import '../widgets/savings_goal_card.dart';
 import '../widgets/smart_command_bar.dart';
 import '../widgets/titanium_card.dart';
 import '../widgets/transfer_dialog.dart';
+import '../widgets/universal_safe_quota_card.dart';
 
 class HomeScreen extends StatelessWidget {
   final StorageService storageService;
@@ -219,7 +221,15 @@ class HomeScreen extends StatelessWidget {
 
                       const SizedBox(height: 12),
 
-                      // 2. One-Liner Smart Command Bar (Conversational Quick Log)
+                      // 2. Universal Daily Safe Quota & Quarantine Vault (v2.0)
+                      UniversalSafeQuotaCard(
+                        storageService: storageService,
+                        privacyMode: privacyMode,
+                      ),
+
+                      const SizedBox(height: 12),
+
+                      // 3. One-Liner Smart Command Bar (Conversational Quick Log)
                       SmartCommandBar(storageService: storageService),
 
                       const SizedBox(height: 22),
@@ -384,6 +394,14 @@ class HomeScreen extends StatelessWidget {
                             ),
                           ],
                         ),
+                      ),
+
+                      const SizedBox(height: 20),
+
+                      // Kantong Impian (Savings Goal Vault)
+                      SavingsGoalCard(
+                        storageService: storageService,
+                        privacyMode: privacyMode,
                       ),
 
                       const SizedBox(height: 24),

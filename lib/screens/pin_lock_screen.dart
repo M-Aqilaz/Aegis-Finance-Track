@@ -219,7 +219,7 @@ class _PinLockScreenState extends State<PinLockScreen> with SingleTickerProvider
 
             const Spacer(),
 
-            // Cyber-Phoenix Emblem & Security Badge
+            // Aegis Shield Emblem & Security Badge
             Container(
               width: 80,
               height: 80,
@@ -239,9 +239,10 @@ class _PinLockScreenState extends State<PinLockScreen> with SingleTickerProvider
                   ),
                 ],
               ),
-              child: ClipOval(
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(22),
                 child: Image.asset(
-                  'assets/icon/fintrack_mascot.png',
+                  'assets/icon/app_icon.png',
                   width: 80,
                   height: 80,
                   fit: BoxFit.cover,

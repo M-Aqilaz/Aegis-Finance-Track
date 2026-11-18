@@ -12,8 +12,8 @@
 <p align="center">
   <img src="https://img.shields.io/badge/Flutter-3.x-02569B?logo=flutter" alt="Flutter"/>
   <img src="https://img.shields.io/badge/Dart-3.x-0175C2?logo=dart" alt="Dart"/>
-  <img src="https://img.shields.io/badge/Version-v1.3.0-blue?logo=android" alt="Version"/>
-  <img src="https://img.shields.io/badge/Tests-36%2F36%20Passed-10B981" alt="Tests"/>
+  <img src="https://img.shields.io/badge/Version-v1.4.0-blue?logo=android" alt="Version"/>
+  <img src="https://img.shields.io/badge/Tests-40%2F40%20Passed-10B981" alt="Tests"/>
   <img src="https://img.shields.io/badge/Privacy-Universal_Offline-00F59B" alt="Privacy"/>
   <img src="https://img.shields.io/badge/Theme-Obsidian%20Executive-00F59B" alt="Theme"/>
   <img src="https://img.shields.io/badge/License-MIT-F59E0B" alt="License"/>
@@ -42,17 +42,17 @@
 
 ---
 
-## 📥 Download APK Android (v1.3.0)
+## 📥 Download APK Android (v1.4.0)
 
 Pasang langsung di HP tanpa perlu login atau registrasi akun:
 
 <p align="center">
-  <a href="https://github.com/M-Aqilaz/Aegis-Finance-Track/releases/download/v1.3.0/AegisFinance-v1.3-arm64.apk">
-    <img src="https://img.shields.io/badge/Download_APK_ARM64-v1.3.0_(21_MB)-00F59B?style=for-the-badge&logo=android&logoColor=0B0F17" alt="Download APK ARM64"/>
+  <a href="https://github.com/M-Aqilaz/Aegis-Finance-Track/releases/download/v1.4.0/AegisFinance-v1.4-arm64.apk">
+    <img src="https://img.shields.io/badge/Download_APK_ARM64-v1.4.0_(21_MB)-00F59B?style=for-the-badge&logo=android&logoColor=0B0F17" alt="Download APK ARM64"/>
   </a>
   &nbsp;&nbsp;
-  <a href="https://github.com/M-Aqilaz/Aegis-Finance-Track/releases/download/v1.3.0/AegisFinance-v1.3-Universal.apk">
-    <img src="https://img.shields.io/badge/Download_Universal-v1.3.0_(Semua_HP)-6366F1?style=for-the-badge&logo=android&logoColor=FFFFFF" alt="Download Universal APK"/>
+  <a href="https://github.com/M-Aqilaz/Aegis-Finance-Track/releases/download/v1.4.0/AegisFinance-v1.4-Universal.apk">
+    <img src="https://img.shields.io/badge/Download_Universal-v1.4.0_(Semua_HP)-6366F1?style=for-the-badge&logo=android&logoColor=FFFFFF" alt="Download Universal APK"/>
   </a>
 </p>
 
@@ -72,14 +72,17 @@ Pasang langsung di HP tanpa perlu login atau registrasi akun:
 Sebagian besar aplikasi keuangan saat ini mewajibkan pembuatan akun, mengunggah catatan pribadi ke cloud pihak ketiga, dan dipenuhi iklan atau langganan bulanan. 
 
 **Aegis Finance dirancang berbeda:**
-1. **Nol Dependensi Cloud**: Semua angka, catatan kas, dan mutasi saldo tersimpan murni di penyimpanan lokal HP Anda.
-2. **⚡ One-Liner Smart Command Bar**: Catat transaksi secepat mengetik chat (`nasi padang 25k`, `kopi 18k seabank`, `gaji 2jt`). Parser otomatis mengekstrak nominal, kategori, dan kantong bank target, lengkap dengan umpan balik sisa limit belanja harian secara real-time.
-3. **🛡 Freedom Runway (Aset Likuid Riil)**: Tahu persis berapa hari atau bulan Anda bisa bertahan hidup dari total cadangan likuid (Kas + Tabungan + Bank Digital) jika tanpa pemasukan sama sekali, lengkap dengan rekomendasi batas belanja harian yang aman.
-4. **👁️ Universal Privacy Eye**: Sensor saldo serentak di seluruh layar (Beranda, Kantong Aset, dan Riwayat) dengan sekali ketuk untuk kenyamanan saat berada di tempat umum.
-5. **Multi-Kantong Saldo Nyata**: Pisahkan uang pegangan tunai (*Cash Stash*), brankas simpanan (*High-Yield Vault*), serta rekening bank digital (*SeaBank, Bank Jago, BCA, dll.*). Pindahkan dana antar-kantong secara instan.
-6. **Cincin Finansial Harian**: Tiga cincin konsentris (*Catat Harian, Kendali Anggaran, dan Porsi Tabungan*) yang memberi umpan balik visual terhadap disiplin finansial Anda.
-7. **Detektor Bocor Halus**: Algoritma lokal di tab Aset yang menganalisis frekuensi pengeluaran kecil berulang beserta rasio arus kas masuk, keluar, dan simpan.
-8. **Proteksi PIN 4-Digit**: Lindungi privasi layar saat HP dipinjam teman atau keluarga dengan PIN vault mandiri.
+1. **Nol Dependensi Cloud & Clean Slate**: Semua angka, catatan kas, dan mutasi saldo tersimpan murni di penyimpanan lokal HP Anda. Pengguna baru mulai dengan dompet bersih (Rp 0 di semua kantong) tanpa data acak.
+2. **🛡️ Universal Daily Safe Spending Quota**: Menghitung kuota jajan aman harian agar uang Anda tidak habis sebelum siklus isi dompet berikutnya, dengan opsi siklus fleksibel (Bulanan, Mingguan, atau Bebas).
+3. **📦 Kotak Pending Belanja (48-Hour Impulse Quarantine)**: Isolasi keinginan belanja non-pokok selama 48 jam untuk meredam nafsu impulsif. Uang yang batal dihamburkan bisa langsung dialokasikan ke target impian!
+4. **🎯 Kantong Impian (Savings Goal Vault)**: Bikin target spesifik (Laptop, Dana Darurat, Liburan) dengan progress bar neon, kalkulator estimasi hari tercapai, dan proteksi penarikan impulsif.
+5. **⚡ One-Liner Smart Command Bar**: Catat transaksi secepat mengetik chat (`nasi padang 25k`, `kopi 18k seabank`, `gaji 2jt`). Parser otomatis mengekstrak nominal, kategori, dan kantong bank target, lengkap dengan umpan balik sisa limit belanja harian secara real-time.
+6. **⏳ Konversi Hari Hidup**: Tahu persis berapa hari jatah uang saku/biaya hidup yang setara dengan suatu barang yang ingin Anda beli (`Setara ~3.2 Hari Hidup`).
+7. **👁️ Universal Privacy Eye**: Sensor saldo serentak di seluruh layar (Beranda, Kantong Aset, dan Riwayat) dengan sekali ketuk untuk kenyamanan saat berada di tempat umum.
+8. **Multi-Kantong Saldo Nyata**: Pisahkan uang pegangan tunai (*Cash Stash*), brankas simpanan (*High-Yield Vault*), serta rekening bank digital (*SeaBank, Bank Jago, BCA, dll.*). Pindahkan dana antar-kantong secara instan.
+9. **Cincin Finansial Harian**: Tiga cincin konsentris (*Catat Harian, Kendali Anggaran, dan Porsi Tabungan*) yang memberi umpan balik visual terhadap disiplin finansial Anda.
+10. **Detektor Bocor Halus**: Algoritma lokal di tab Aset yang menganalisis frekuensi pengeluaran kecil berulang beserta rasio arus kas masuk, keluar, dan simpan.
+11. **Proteksi PIN 4-Digit**: Lindungi privasi layar saat HP dipinjam teman atau keluarga dengan PIN vault mandiri.
 
 ---
 
@@ -88,7 +91,7 @@ Sebagian besar aplikasi keuangan saat ini mewajibkan pembuatan akun, mengunggah 
 Aplikasi dibangun menggunakan Flutter & Dart dengan cakupan uji logika (whitebox, blackbox, dan widget) komprehensif:
 
 ```bash
-# Uji seluruh algoritma rekurensi saldo, parser perintah, dan keamanan PIN (36 tests)
+# Uji seluruh algoritma rekurensi saldo, parser perintah, dan keamanan PIN (40 tests)
 flutter test
 
 # Jalankan aplikasi di emulator / perangkat fisik
