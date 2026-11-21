@@ -28,46 +28,87 @@ class QuickLogBottomSheet extends StatefulWidget {
 class _QuickLogBottomSheetState extends State<QuickLogBottomSheet> {
   String _type = 'expense'; // 'expense', 'income', 'save'
   ExpenseCategory _selectedCategory = ExpenseCategory.makanan;
-  String _amountStr = '0';
 
-  double get _amount => double.tryParse(_amountStr) ?? 0.0;
+  // Independent isolated amounts per tab so amounts never leak across categories
+  String _expenseAmountStr = '0';
+  String _incomeAmountStr = '0';
+  String _saveAmountStr = '0';
+
+  String get _currentAmountStr {
+    switch (_type) {
+      case 'income':
+        return _incomeAmountStr;
+      case 'save':
+        return _saveAmountStr;
+      case 'expense':
+      default:
+        return _expenseAmountStr;
+    }
+  }
+
+  set _currentAmountStr(String val) {
+    switch (_type) {
+      case 'income':
+        _incomeAmountStr = val;
+        break;
+      case 'save':
+        _saveAmountStr = val;
+        break;
+      case 'expense':
+      default:
+        _expenseAmountStr = val;
+        break;
+    }
+  }
+
+  double get _expenseAmount => double.tryParse(_expenseAmountStr) ?? 0.0;
+  double get _incomeAmount => double.tryParse(_incomeAmountStr) ?? 0.0;
+  double get _saveAmount => double.tryParse(_saveAmountStr) ?? 0.0;
+  double get _amount => double.tryParse(_currentAmountStr) ?? 0.0;
 
   void _onDigit(String d) {
     setState(() {
-      if (_amountStr == '0') {
-        _amountStr = d;
-      } else if (_amountStr.length < 9) {
-        _amountStr += d;
+      var cur = _currentAmountStr;
+      if (cur == '0') {
+        cur = d;
+      } else if (cur.length < 9) {
+        cur += d;
       }
+      _currentAmountStr = cur;
     });
   }
 
   void _onBackspace() {
     setState(() {
-      if (_amountStr.length <= 1) {
-        _amountStr = '0';
+      var cur = _currentAmountStr;
+      if (cur.length <= 1) {
+        cur = '0';
       } else {
-        _amountStr = _amountStr.substring(0, _amountStr.length - 1);
+        cur = cur.substring(0, cur.length - 1);
       }
+      _currentAmountStr = cur;
     });
   }
 
   void _onClear() {
     setState(() {
-      _amountStr = '0';
+      _currentAmountStr = '0';
     });
   }
 
   void _addQuick(int val) {
     setState(() {
-      final current = double.tryParse(_amountStr) ?? 0.0;
-      _amountStr = (current + val).toInt().toString();
+      final current = double.tryParse(_currentAmountStr) ?? 0.0;
+      _currentAmountStr = (current + val).toInt().toString();
     });
   }
 
   Future<void> _submit() async {
-    final amount = _amount;
-    if (amount <= 0) {
+    final exp = _expenseAmount;
+    final inc = _incomeAmount;
+    final sav = _saveAmount;
+
+    if (exp <= 0 && inc <= 0 && sav <= 0) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Masukkan nominal lebih dari 0'),
@@ -82,57 +123,53 @@ class _QuickLogBottomSheetState extends State<QuickLogBottomSheet> {
     final today = DateTime(now.year, now.month, now.day);
     final existing = widget.storageService.getEntryByDate(today);
 
-    DayEntry newEntry;
-    if (existing != null) {
-      if (_type == 'expense') {
-        final newItems = List<ExpenseItem>.from(existing.expenses);
-        newItems.add(ExpenseItem(
-          id: uuid.v4(),
-          title: _selectedCategory.displayName,
-          amount: amount,
-          category: _selectedCategory,
-        ));
-        newEntry = existing.copyWith(expenses: newItems);
-      } else if (_type == 'income') {
-        newEntry = existing.copyWith(income: existing.income + amount);
-      } else {
-        // save
-        newEntry = existing.copyWith(saveAmount: existing.saveAmount + amount);
-      }
-    } else {
-      if (_type == 'expense') {
-        newEntry = DayEntry(
-          id: uuid.v4(),
-          date: today,
-          expenses: [
-            ExpenseItem(
-              id: uuid.v4(),
-              title: _selectedCategory.displayName,
-              amount: amount,
-              category: _selectedCategory,
-            ),
-          ],
-        );
-      } else if (_type == 'income') {
-        newEntry = DayEntry(id: uuid.v4(), date: today, income: amount);
-      } else {
-        newEntry = DayEntry(id: uuid.v4(), date: today, saveAmount: amount);
-      }
+    final List<ExpenseItem> updatedExpenses = existing != null
+        ? List<ExpenseItem>.from(existing.expenses)
+        : <ExpenseItem>[];
+
+    if (exp > 0) {
+      updatedExpenses.add(ExpenseItem(
+        id: uuid.v4(),
+        title: _selectedCategory.displayName,
+        amount: exp,
+        category: _selectedCategory,
+      ));
     }
+
+    final double newIncome = (existing?.income ?? 0.0) + (inc > 0 ? inc : 0.0);
+    final double newSave = (existing?.saveAmount ?? 0.0) + (sav > 0 ? sav : 0.0);
+
+    final newEntry = DayEntry(
+      id: existing?.id ?? uuid.v4(),
+      date: today,
+      income: newIncome,
+      incomeNote: existing?.incomeNote ?? '',
+      saveAmount: newSave,
+      saveNote: existing?.saveNote ?? '',
+      expenses: updatedExpenses,
+      directExpense: 0.0,
+    );
 
     await widget.storageService.saveOrUpdateEntry(newEntry);
 
     if (mounted) {
       Navigator.pop(context);
+      final List<String> summaryParts = [];
+      if (exp > 0) summaryParts.add('Keluar: ${CurrencyFormatter.formatRp(exp)}');
+      if (inc > 0) summaryParts.add('Masuk: ${CurrencyFormatter.formatRp(inc)}');
+      if (sav > 0) summaryParts.add('Nabung: ${CurrencyFormatter.formatRp(sav)}');
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Row(
             children: [
               const Icon(Icons.check_circle_rounded, color: Colors.white, size: 20),
               const SizedBox(width: 8),
-              Text(
-                'Tercatat: ${CurrencyFormatter.formatRp(amount)} (${_type.toUpperCase()})',
-                style: const TextStyle(fontWeight: FontWeight.bold),
+              Expanded(
+                child: Text(
+                  'Tercatat: ${summaryParts.join(' • ')}',
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
               ),
             ],
           ),
@@ -144,8 +181,16 @@ class _QuickLogBottomSheetState extends State<QuickLogBottomSheet> {
   }
 
   Future<void> _quarantine() async {
-    final amount = _amount;
-    if (amount <= 0) return;
+    final amount = _expenseAmount;
+    if (amount <= 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Masukkan nominal pengeluaran di tab Keluar terlebih dahulu'),
+          backgroundColor: AppTheme.neonCoral,
+        ),
+      );
+      return;
+    }
     final item = ImpulseItem(
       id: const Uuid().v4(),
       title: _selectedCategory.displayName,
@@ -463,6 +508,11 @@ class _QuickLogBottomSheetState extends State<QuickLogBottomSheet> {
 
   Widget _buildTypeTab(String label, String type, Color color, IconData icon) {
     final isSel = _type == type;
+    double tabAmount = 0.0;
+    if (type == 'expense') tabAmount = _expenseAmount;
+    if (type == 'income') tabAmount = _incomeAmount;
+    if (type == 'save') tabAmount = _saveAmount;
+
     return Expanded(
       child: GestureDetector(
         onTap: () => setState(() => _type = type),
@@ -472,23 +522,41 @@ class _QuickLogBottomSheetState extends State<QuickLogBottomSheet> {
             color: isSel ? color.withValues(alpha: 0.2) : AppTheme.surfaceCardElevated,
             borderRadius: BorderRadius.circular(14),
             border: Border.all(
-              color: isSel ? color : AppTheme.borderLight,
-              width: 1.2,
+              color: isSel
+                  ? color
+                  : (tabAmount > 0 ? color.withValues(alpha: 0.5) : AppTheme.borderLight),
+              width: isSel ? 1.5 : 1.0,
             ),
           ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(icon, size: 14, color: isSel ? color : Colors.white60),
-              const SizedBox(width: 5),
-              Text(
-                label,
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: isSel ? FontWeight.w800 : FontWeight.w600,
-                  color: isSel ? Colors.white : Colors.white60,
-                ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(icon, size: 14, color: isSel ? color : (tabAmount > 0 ? color : Colors.white60)),
+                  const SizedBox(width: 5),
+                  Text(
+                    label,
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: isSel ? FontWeight.w800 : FontWeight.w600,
+                      color: isSel ? Colors.white : (tabAmount > 0 ? Colors.white70 : Colors.white60),
+                    ),
+                  ),
+                ],
               ),
+              if (tabAmount > 0) ...[
+                const SizedBox(height: 2),
+                Text(
+                  CurrencyFormatter.formatShort(tabAmount),
+                  style: TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w700,
+                    color: color,
+                  ),
+                ),
+              ],
             ],
           ),
         ),

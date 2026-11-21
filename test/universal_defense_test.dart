@@ -2,6 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:financial_track/models/impulse_item.dart';
 import 'package:financial_track/models/savings_goal.dart';
+import 'package:financial_track/models/transaction_entry.dart';
 import 'package:financial_track/services/storage_service.dart';
 
 void main() {
@@ -152,6 +153,42 @@ void main() {
       // Test deleting goal
       await storage.deleteSavingsGoal('goal-1');
       expect(storage.savingsGoals.isEmpty, isTrue);
+    });
+
+    test('Multi-tab isolated transaction logging preserves both expense and income without amount leak', () async {
+      final storage = StorageService();
+      await storage.init(loadSampleDataIfEmpty: false);
+
+      final today = DateTime.now();
+      final normalizedDate = DateTime(today.year, today.month, today.day);
+
+      // Simulate user logging expense 2000 and income 10000 in one session
+      final expAmount = 2000.0;
+      final incAmount = 10000.0;
+
+      final entry = DayEntry(
+        id: 'test-multi-tab-entry',
+        date: normalizedDate,
+        income: incAmount,
+        saveAmount: 0.0,
+        expenses: [
+          ExpenseItem(
+            id: 'exp-1',
+            title: ExpenseCategory.makanan.displayName,
+            amount: expAmount,
+            category: ExpenseCategory.makanan,
+          ),
+        ],
+      );
+
+      await storage.saveOrUpdateEntry(entry);
+
+      final saved = storage.getEntryByDate(normalizedDate);
+      expect(saved, isNotNull);
+      expect(saved!.income, 10000.0);
+      expect(saved.totalExpense, 2000.0);
+      // Net cash flow must be 10000 - 2000 = 8000 (NOT 12000!)
+      expect(saved.netCashFlow, 8000.0);
     });
   });
 }
