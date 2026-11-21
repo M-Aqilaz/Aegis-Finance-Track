@@ -87,6 +87,24 @@ extension ExpenseCategoryExtension on ExpenseCategory {
       case ExpenseCategory.lainnya:   return '📦';
     }
   }
+
+  /// Menentukan apakah kategori ini merupakan Kebutuhan Pokok (Needs) atau Jajan/Gaya Hidup (Wants)
+  bool get isEssential {
+    switch (this) {
+      case ExpenseCategory.transport: // Bensin, ojol, ongkos kerja/kuliah, parkir
+      case ExpenseCategory.tagihan:   // Listrik, kos, pulsa data utama, air
+      case ExpenseCategory.darurat:   // Obat, medis, servis darurat
+      case ExpenseCategory.makanan:   // Pangan & makan pokok harian
+        return true;
+      case ExpenseCategory.jajan:     // Kopi, boba, jajan santai (Bocor halus)
+      case ExpenseCategory.hiburan:   // Game, nonton, nongkrong
+      case ExpenseCategory.belanja:   // Belanja non-pokok
+      case ExpenseCategory.lainnya:
+        return false;
+    }
+  }
+
+  String get typeLabel => isEssential ? 'Kebutuhan Pokok' : 'Jajan / Keinginan';
 }
 
 class ExpenseItem {
@@ -95,6 +113,7 @@ class ExpenseItem {
   final double amount;
   final ExpenseCategory category;
   final String note;
+  final bool isEssential;
 
   ExpenseItem({
     required this.id,
@@ -102,7 +121,8 @@ class ExpenseItem {
     required this.amount,
     this.category = ExpenseCategory.lainnya,
     this.note = '',
-  });
+    bool? isEssential,
+  }) : isEssential = isEssential ?? category.isEssential;
 
   Map<String, dynamic> toJson() => {
         'id': id,
@@ -110,18 +130,21 @@ class ExpenseItem {
         'amount': amount,
         'category': category.name,
         'note': note,
+        'isEssential': isEssential,
       };
 
   factory ExpenseItem.fromJson(Map<String, dynamic> json) {
+    final cat = ExpenseCategory.values.firstWhere(
+      (e) => e.name == json['category'],
+      orElse: () => ExpenseCategory.lainnya,
+    );
     return ExpenseItem(
       id: json['id'] as String,
       title: json['title'] as String? ?? 'Pengeluaran',
       amount: (json['amount'] as num).toDouble(),
-      category: ExpenseCategory.values.firstWhere(
-        (e) => e.name == json['category'],
-        orElse: () => ExpenseCategory.lainnya,
-      ),
+      category: cat,
       note: json['note'] as String? ?? '',
+      isEssential: json['isEssential'] as bool? ?? cat.isEssential,
     );
   }
 }
@@ -158,6 +181,22 @@ class DayEntry {
     if (expenses.isNotEmpty) {
       final itemsSum = expenses.fold(0.0, (sum, item) => sum + item.amount);
       if (itemsSum > 0) return itemsSum;
+    }
+    return directExpense;
+  }
+
+  /// Total pengeluaran kebutuhan pokok harian (Bensin, makan pokok, tagihan, obat)
+  double get essentialExpense {
+    if (expenses.isNotEmpty) {
+      return expenses.where((e) => e.isEssential).fold(0.0, (sum, item) => sum + item.amount);
+    }
+    return 0.0;
+  }
+
+  /// Total pengeluaran jajan & gaya hidup (Wants / Bocor Halus)
+  double get discretionaryExpense {
+    if (expenses.isNotEmpty) {
+      return expenses.where((e) => !e.isEssential).fold(0.0, (sum, item) => sum + item.amount);
     }
     return directExpense;
   }

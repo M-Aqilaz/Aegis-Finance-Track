@@ -16,6 +16,9 @@ class DailySafeSpendMetrics {
   final double percentUsed;
   final int daysLeftInCycle;
   final String cycleLabel;
+  final double essentialSpent;
+  final double discretionarySpent;
+  final bool isOverDueToEssentialsOnly;
 
   const DailySafeSpendMetrics({
     required this.safeQuota,
@@ -24,6 +27,9 @@ class DailySafeSpendMetrics {
     required this.percentUsed,
     required this.daysLeftInCycle,
     required this.cycleLabel,
+    this.essentialSpent = 0.0,
+    this.discretionarySpent = 0.0,
+    this.isOverDueToEssentialsOnly = false,
   });
 }
 
@@ -1128,6 +1134,14 @@ class StorageService extends ChangeNotifier {
     final remainingQuota = safeQuota - spentToday;
     final percentUsed = safeQuota > 0 ? (spentToday / safeQuota) : 0.0;
 
+    final essentialSpent = todayEntry?.essentialExpense ?? 0.0;
+    final discretionarySpent = todayEntry?.discretionaryExpense ?? 0.0;
+    final isOver = remainingQuota < 0;
+    final isOverDueToEssentialsOnly = isOver &&
+        (essentialSpent > 0 &&
+            (discretionarySpent == 0 ||
+                (safeQuota > 0 && discretionarySpent <= safeQuota)));
+
     return DailySafeSpendMetrics(
       safeQuota: safeQuota,
       spentToday: spentToday,
@@ -1135,6 +1149,9 @@ class StorageService extends ChangeNotifier {
       percentUsed: percentUsed,
       daysLeftInCycle: daysLeft,
       cycleLabel: label,
+      essentialSpent: essentialSpent,
+      discretionarySpent: discretionarySpent,
+      isOverDueToEssentialsOnly: isOverDueToEssentialsOnly,
     );
   }
 

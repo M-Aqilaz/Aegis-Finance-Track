@@ -190,5 +190,41 @@ void main() {
       // Net cash flow must be 10000 - 2000 = 8000 (NOT 12000!)
       expect(saved.netCashFlow, 8000.0);
     });
+
+    test('Smart Essential vs Discretionary Quota: Spending 35k on Bensin does not trigger discretionary alert', () async {
+      final storage = StorageService();
+      await storage.init(loadSampleDataIfEmpty: false);
+
+      final today = DateTime.now();
+      final normalizedDate = DateTime(today.year, today.month, today.day);
+
+      // User spends 35,000 on Transportasi & Bensin (Essential)
+      final bensinExpense = ExpenseItem(
+        id: 'exp-bensin',
+        title: 'Bensin Motor',
+        amount: 35000.0,
+        category: ExpenseCategory.transport,
+      );
+
+      final entry = DayEntry(
+        id: 'test-bensin-entry',
+        date: normalizedDate,
+        expenses: [bensinExpense],
+      );
+
+      await storage.saveOrUpdateEntry(entry);
+
+      final saved = storage.getEntryByDate(normalizedDate);
+      expect(saved, isNotNull);
+      expect(saved!.essentialExpense, 35000.0);
+      expect(saved.discretionaryExpense, 0.0);
+
+      final metrics = storage.getDailySafeSpendingMetrics();
+      expect(metrics.essentialSpent, 35000.0);
+      expect(metrics.discretionarySpent, 0.0);
+      if (metrics.remainingQuota < 0) {
+        expect(metrics.isOverDueToEssentialsOnly, isTrue);
+      }
+    });
   });
 }

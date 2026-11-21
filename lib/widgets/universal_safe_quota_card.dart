@@ -35,14 +35,19 @@ class UniversalSafeQuotaCard extends StatelessWidget {
     // Status logic
     final isOver = metrics.remainingQuota < 0;
     final isWarning = !isOver && metrics.percentUsed > 0.75;
+    final isEssentialsOnly = metrics.isOverDueToEssentialsOnly;
     
-    final Color statusColor = isOver
-        ? AppTheme.neonCoral
-        : (isWarning ? AppTheme.solarAmber : AppTheme.cyberMint);
+    final Color statusColor = isEssentialsOnly
+        ? AppTheme.electricCyan
+        : (isOver
+            ? AppTheme.neonCoral
+            : (isWarning ? AppTheme.solarAmber : AppTheme.cyberMint));
 
-    final String statusText = isOver
-        ? 'MELEBIHI KUOTA'
-        : (isWarning ? 'MENDEKATI LIMIT' : 'SANGAT AMAN');
+    final String statusText = isEssentialsOnly
+        ? 'KEBUTUHAN POKOK'
+        : (isOver
+            ? 'MELEBIHI KUOTA JAJAN'
+            : (isWarning ? 'MENDEKATI LIMIT' : 'SANGAT AMAN'));
 
     return Container(
       decoration: BoxDecoration(
@@ -78,7 +83,7 @@ class UniversalSafeQuotaCard extends StatelessWidget {
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: Icon(
-                        Icons.shield_outlined,
+                        isEssentialsOnly ? Icons.verified_outlined : Icons.shield_outlined,
                         size: 16,
                         color: statusColor,
                       ),
@@ -97,10 +102,14 @@ class UniversalSafeQuotaCard extends StatelessWidget {
                           ),
                         ),
                         Text(
-                          'Batas aman jajan agar tidak tekor',
+                          isEssentialsOnly
+                              ? 'Kebutuhan pokok & operasional terdeteksi'
+                              : 'Batas aman jajan agar tidak tekor',
                           style: TextStyle(
                             fontSize: 10,
-                            color: Colors.white.withValues(alpha: 0.4),
+                            color: isEssentialsOnly
+                                ? AppTheme.electricCyan.withValues(alpha: 0.8)
+                                : Colors.white.withValues(alpha: 0.4),
                           ),
                         ),
                       ],
@@ -151,20 +160,26 @@ class UniversalSafeQuotaCard extends StatelessWidget {
                           fontSize: 26,
                           fontWeight: FontWeight.w900,
                           letterSpacing: -0.5,
-                          color: isOver ? AppTheme.neonCoral : Colors.white,
+                          color: isEssentialsOnly
+                              ? AppTheme.electricCyan
+                              : (isOver ? AppTheme.neonCoral : Colors.white),
                         ),
                       ),
                       const SizedBox(height: 2),
                       Text(
                         privacyMode
                             ? 'Sisa dari jatah harian: Rp •••'
-                            : (isOver
-                                ? 'Tekor ${CurrencyFormatter.formatRp(metrics.remainingQuota.abs())} hari ini'
-                                : 'Tersisa dari total kuota ${CurrencyFormatter.formatRp(metrics.safeQuota)}/hari'),
+                            : (isEssentialsOnly
+                                ? 'Alokasi pokok ${CurrencyFormatter.formatRp(metrics.essentialSpent)} • Jajan aman (${CurrencyFormatter.formatRp(metrics.discretionarySpent)})'
+                                : (isOver
+                                    ? 'Tekor jajan ${CurrencyFormatter.formatRp(metrics.remainingQuota.abs())} hari ini'
+                                    : 'Tersisa dari total kuota ${CurrencyFormatter.formatRp(metrics.safeQuota)}/hari')),
                         style: TextStyle(
                           fontSize: 11.5,
                           fontWeight: FontWeight.w500,
-                          color: isOver ? AppTheme.neonCoral.withValues(alpha: 0.9) : Colors.white54,
+                          color: isEssentialsOnly
+                              ? AppTheme.electricCyan.withValues(alpha: 0.9)
+                              : (isOver ? AppTheme.neonCoral.withValues(alpha: 0.9) : Colors.white54),
                         ),
                       ),
                     ],
@@ -234,6 +249,71 @@ class UniversalSafeQuotaCard extends StatelessWidget {
               ),
             ),
           ),
+
+          if (metrics.spentToday > 0) ...[
+            const SizedBox(height: 10),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 18),
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    decoration: BoxDecoration(
+                      color: AppTheme.electricCyan.withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(6),
+                      border: Border.all(color: AppTheme.electricCyan.withValues(alpha: 0.3), width: 0.8),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.check_circle_rounded, size: 10, color: AppTheme.electricCyan),
+                        const SizedBox(width: 4),
+                        Text(
+                          'Pokok: ${privacyMode ? 'Rp •••' : CurrencyFormatter.formatRp(metrics.essentialSpent)}',
+                          style: const TextStyle(fontSize: 10.5, fontWeight: FontWeight.w700, color: AppTheme.electricCyan),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    decoration: BoxDecoration(
+                      color: (metrics.discretionarySpent > metrics.safeQuota)
+                          ? AppTheme.neonCoral.withValues(alpha: 0.12)
+                          : Colors.white.withValues(alpha: 0.06),
+                      borderRadius: BorderRadius.circular(6),
+                      border: Border.all(
+                        color: (metrics.discretionarySpent > metrics.safeQuota)
+                            ? AppTheme.neonCoral.withValues(alpha: 0.3)
+                            : Colors.white12,
+                        width: 0.8,
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.local_cafe_rounded,
+                          size: 10,
+                          color: (metrics.discretionarySpent > metrics.safeQuota) ? AppTheme.neonCoral : Colors.white70,
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          'Jajan: ${privacyMode ? 'Rp •••' : CurrencyFormatter.formatRp(metrics.discretionarySpent)}',
+                          style: TextStyle(
+                            fontSize: 10.5,
+                            fontWeight: FontWeight.w700,
+                            color: (metrics.discretionarySpent > metrics.safeQuota) ? AppTheme.neonCoral : Colors.white70,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
 
           const SizedBox(height: 14),
 
